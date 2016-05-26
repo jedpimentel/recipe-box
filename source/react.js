@@ -109,15 +109,74 @@ var RecipeBig = React.createClass({
 
 //edit version,
 //used to create or edit a recipe, formatted similar to big version
+//defaultRecipe 'defaultRecipe' needs to be replaced with a better solution.
+//pending changes are saved in state, once changes are saved, the updated data is sent to the parent to be used as props
+//props=saved state=notSaved
 var RecipeEdit = React.createClass({
+	getInitialState: function() {
+		var defaultRecipe = new RecipeDataItem(
+		'name',
+		['ingredient1', 'ingredient2', 'ingredient3' ],
+		'description'
+		)
+		var initialStateRecipe = ( this.props.hasOwnProperty('recipe') ? this.props.recipe : defaultRecipe )
+		
+		return {
+			'recipe': initialStateRecipe,
+			'name': initialStateRecipe.name,
+			'directions': initialStateRecipe.directions,
+			'ingredients': initialStateRecipe.ingredients
+		}
+	},
+	handleChange: function(event) {
+		goBoopBeep();
+		this.setState({})
+	},
+	updateRecipeName: function(event) {
+		goBoopBeep();
+		this.setState({name: event.target.value})
+	},
+	updateRecipeDirections: function(event) {
+		goBoopBeep();
+		this.setState({directions: event.target.value})
+	},
+	removeRecipeItem: function(index) {
+		return function() {
+			var ingredients = this.state.ingredients;
+			ingredients.splice(index, 1);
+			if (ingredients.length === 0) {
+				// all recipes need at least one ingredient
+				ingredients.push('');
+			}
+			this.setState({ingredients: ingredients})
+		}.bind(this);
+		
+	}, 
 	render: function() {
+		// value from 'props' was the saved/original value, value in 'state' is the unsaved value
+		var recipeName = this.props.recipe.name;
+		var removeRecipeItem = this.removeRecipeItem;
+		var ingredientChildren = this.state.recipe.ingredients.map(function(item, index) {
+			var keyName = recipeName + index;
+			return (
+				<div key={keyName} index={index} >
+					<input type="text" name={"recipe-ingredient-"+index} value={item} onChange={function(){;}} />
+					<button type="button" onClick={removeRecipeItem(index)} ingredientIndex={index}>delete</button>
+				</div>
+			);
+		});
 		return (
-			<div className="recipe" >
-				<div>{this.props.recipe.name}</div>
-				<div>{this.props.recipe.directions}</div>
+			<form className="recipe" >
+				<div>RECIPE NAME</div>
+				<input type="text" name="recipe-name" value={this.state.name} onChange={this.updateRecipeName} />
+				<div>RECIPE INGREDIENTS</div>
+				<div>{ingredientChildren}</div> 
+				<div>RECIPE DIRECTIONS</div>
+				<input type="text" name="recipe-directions" value={this.state.directions} onChange={this.updateRecipeDirections} />
+				<br />
 				<button>cancel</button>
 				<button>save</button>
-			</div>
+			</form>
 		);
 	}
 })
@@ -206,3 +265,8 @@ ReactDOM.render(
 	<RecipeApp />,
 	document.getElementById('main')
 );
+
+
+function goBoopBeep() {
+	console.log(['boop', 'beep'][Math.floor(Math.random() * 2 )]);
+}
