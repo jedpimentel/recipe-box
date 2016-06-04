@@ -2,6 +2,9 @@
 
 /*
 I apologize if my code gives you a headache.
+I'm still learning how to even use React at all as I write this
+some of the stuff is stuck with gum, as refactoring would be impractical
+
 
 */
 
@@ -161,12 +164,14 @@ var RecipeEdit = React.createClass({
 	getInitialState: function getInitialState() {
 		var defaultRecipe = new RecipeDataItem('name', ['ingredient1', 'ingredient2', 'ingredient3'], 'description');
 		var initialStateRecipe = this.props.hasOwnProperty('recipe') ? this.props.recipe : defaultRecipe;
+		var initialIngredients = initialStateRecipe.ingredients.slice();
 
+		console.log(initialIngredients);
 		return {
 			'recipe': initialStateRecipe,
 			'name': initialStateRecipe.name,
 			'directions': initialStateRecipe.directions,
-			'ingredients': initialStateRecipe.ingredients
+			'ingredients': initialIngredients
 		};
 	},
 	handleChange: function handleChange(event) {
@@ -181,32 +186,72 @@ var RecipeEdit = React.createClass({
 		goBoopBeep();
 		this.setState({ directions: event.target.value });
 	},
-	removeRecipeItem: function removeRecipeItem(index) {
-		return function () {
-			var ingredients = this.state.ingredients;
-			ingredients.splice(index, 1);
-			if (ingredients.length === 0) {
-				// all recipes need at least one ingredient
-				ingredients.push('');
-			}
-			this.setState({ ingredients: ingredients });
+	updateIngredientItem: function updateIngredientItem(index) {
+		return function (event) {
+			var newIngredientState = this.state.ingredients;;
+			newIngredientState[index] = event.target.value;
+			this.setState({ ingredients: newIngredientState });
 		}.bind(this);
+	},
+	removeIngredientItem: function removeIngredientItem(index) {
+		return function () {
+			var newIngredients = this.state.ingredients;
+
+			newIngredients.splice(index, 1);
+			if (newIngredients.length === 0) {
+				// all recipes need at least one ingredient
+				newIngredients.push('');
+			}
+			console.log(newIngredients);
+			this.setState({ ingredients: newIngredients });
+			console.log(this.state);
+		}.bind(this);
+	},
+	cancelEdit: function cancelEdit() {
+		// disregard current state of this element and switch to a non-edit view
+		// TODO: if it was meant as a "new" recipe, this option should delete the recipe.
+		//this.props.rootElement.setState({displayFormat: 'maximized'})
+
+		// if this was an existing recipe (else assume it was a new/tentative recipe)
+		console.log(this.props);
+		if (this.props.hasOwnProperty('recipe')) {
+			// revert to orinal state
+			this.setState({
+				'recipe': this.props.recipe,
+				'name': this.props.recipe.name,
+				'directions': this.props.recipe.directions,
+				'ingredients': this.state.recipe.ingredients
+			});
+		} else {
+			// delete the recipe
+			// the following setDisplayType might need be moved to the previous if
+		}
+		this.props.rootElement.setDisplayType('maximized');
+	},
+	saveEdit: function saveEdit() {
+		// validate that data exists
+		// remove blank ingredient entries
+
+		// update root's data
+		this.props.rootElement.setDisplayType('maximized');
+
+		var newRecipe = new RecipeDataItem(this.state.name, this.state.ingredients, this.state.directions);
+		this.props.rootElement.props.updateRecipeData(newRecipe);
 	},
 	render: function render() {
 		// value from 'props' was the saved/original value, value in 'state' is the unsaved value
 		var recipeName = this.props.recipe.name;
-		var removeRecipeItem = this.removeRecipeItem;
-		var ingredientChildren = this.state.recipe.ingredients.map(function (item, index) {
+		var removeIngredientItem = this.removeIngredientItem;
+		var updateIngredientItem = this.updateIngredientItem;
+		var ingredientChildren = this.state.ingredients.map(function (item, index) {
 			var keyName = recipeName + index;
 			return React.createElement(
 				'div',
 				{ key: keyName, index: index },
-				React.createElement('input', { type: 'text', name: "recipe-ingredient-" + index, value: item, onChange: function onChange() {
-						;
-					} }),
+				React.createElement('input', { type: 'text', name: "recipe-ingredient-" + index, value: item, onChange: updateIngredientItem(index) }),
 				React.createElement(
 					'button',
-					{ type: 'button', onClick: removeRecipeItem(index), ingredientIndex: index },
+					{ type: 'button', onClick: removeIngredientItem(index), ingredientIndex: index },
 					'delete'
 				)
 			);
@@ -239,12 +284,12 @@ var RecipeEdit = React.createClass({
 			React.createElement('br', null),
 			React.createElement(
 				'button',
-				null,
+				{ type: 'button', onClick: this.cancelEdit },
 				'cancel'
 			),
 			React.createElement(
 				'button',
-				null,
+				{ type: 'button', onClick: this.saveEdit },
 				'save'
 			)
 		);
@@ -282,7 +327,7 @@ var RecipeItem = React.createClass({
 			return React.createElement(RecipeBig, { recipe: this.props.recipe, rootElement: this });
 		}
 		if (formatType === 'edit') {
-			return React.createElement(RecipeEdit, { recipe: this.props.recipe, rootElement: this });
+			return React.createElement(RecipeEdit, { recipe: this.props.recipe, rootElement: this, updateRecipeData: this.props.updateRecipeData });
 		}
 
 		console.log("unrecognized displayState, please check possible RecipeItem state names");
@@ -293,9 +338,21 @@ var RecipeItem = React.createClass({
 var RecipeContainer = React.createClass({
 	displayName: 'RecipeContainer',
 
+	getInitialState: function getInitialState() {
+		// recipeData is a global variable
+		return { recipeData: recipeData };
+	},
+	updateRecipeData: function updateRecipeData(index) {
+		return function (recipe) {
+			var newData = this.state.recipeData;
+			newData[index] = recipe;
+			this.setState({ recipeData: newData });
+		}.bind(this);
+	},
 	render: function render() {
-		var recipeEntries = this.props.recipeData.map(function (entry, index) {
-			return React.createElement(RecipeItem, { recipe: entry, key: index });
+		var updateFunction = this.updateRecipeData;
+		var recipeEntries = this.state.recipeData.map(function (entry, index) {
+			return React.createElement(RecipeItem, { recipe: entry, key: index, updateRecipeData: updateFunction(index) });
 		});
 		return React.createElement(
 			'div',
@@ -331,7 +388,7 @@ var RecipeApp = React.createClass({
 				null,
 				'Recipes!'
 			),
-			React.createElement(RecipeContainer, { recipeData: recipeData })
+			React.createElement(RecipeContainer, null)
 		);
 	}
 

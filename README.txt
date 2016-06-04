@@ -26,3 +26,4 @@ nice to haves:
 
 stuff to look out for:
 	forgot about .bind() for a while, some of the code would be better off with .bind() than it's current state.
+	
