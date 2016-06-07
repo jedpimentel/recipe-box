@@ -68,4 +68,14 @@ body {
         .recipe-name-bar .recipe-buttons button {
           font-size: 60%; } }
 
+#button-add-new {
+  width: 100%; }
+
+#button-reset-app {
+  float: right; }
+
+.subdued-button {
+  background-color: #AAA;
+  color: #BBB; }
+
 /*# sourceMappingURL=sass.css.map */

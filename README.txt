@@ -20,9 +20,11 @@ todo:
 	restrict editting mode to only allow one recipe to be editted at a time
 	add "are you sure you want to quit before saving?" text
 	add "are you sure you want to delete recipe?" text
+	keep the hard reset button, but move it to the bottom of the screen and use a confirmation that everything will be deleted
 	
 nice to haves:
 	ability to change order of ingredient items, maybe a click and drag
+	
 
 stuff to look out for:
 	forgot about .bind() for a while, some of the code would be better off with .bind() than it's current state.

@@ -12,13 +12,17 @@ function RecipeDataItem(name, ingredients, directions) {
 	this.directions = directions;
 }
 
-var recipeData = [];
-recipeData.push(new RecipeDataItem('pizza', ['first', 'second', 'third'], 'cook it until edible'));
-recipeData.push(new RecipeDataItem('spaghetti', ['first', 'second', 'third'], 'cook it until edible'));
-recipeData.push(new RecipeDataItem('pancakes', ['first', 'second', 'third'], 'cook it until edible'));
 
-console.log(recipeData);
+function hardReset() {
+	if (confirm("Are you sure you want to undo all edits and return this app to its default information? This is meant for debugging/demo purposes and all edits will be lost.")) {
+		localStorage.clear();
+		location.reload();
+	}
+	
+	
+}
 
+// is this used ?
 var IngredientListItem = React.createClass({
 	render: function() {
 		return (
@@ -63,7 +67,7 @@ var RecipeDetails = React.createClass({
 				</ul>
 				<div className="recipe-directions">{this.props.recipe.directions}</div>
 			</div>
-		);
+		) 
 	}
 });
 
@@ -90,20 +94,47 @@ var RecipeSmall = React.createClass({
 
 //big version, shows all the info
 var RecipeBig = React.createClass({
+	getInitialState: function() {
+		return {clickCount: 0};
+	},
 	goToEditMode: function() {
-		this.props.rootElement.setDisplayType('edit');
+		console.log(this.state.clickCount);
+		if (this.props.rootElement.props.editState() === false) {
+			this.props.rootElement.setDisplayType('edit');
+		} else if (this.state.clickCount >= 4) {
+			alert('please save or cancel any pending edits before edditing another recipe');
+		} else {
+			this.setState({clickCount: this.state.clickCount + 1})
+		} 
+	},
+	deleteRecipe: function() {
+		console.log("TODO: delete this recipe");
+		this.props.rootElement.setDisplayType('delete');
+	},
+	confirmDelete: function() {
+		function confirmDelete() {
+			if(window.confirm("Are you sure you want to delete " + this.props.recipe.name + "?")) {
+				console.log('deleting...', this)
+				this.deleteRecipe();
+			} else {
+				;
+			}
+		}
+		setTimeout(confirmDelete.bind(this), 0);
 	},
 	render: function() {
+		var thereIsAnActiveEditBox = this.props.rootElement.props.editState();
+		var subduedButton = thereIsAnActiveEditBox? 'subdued-button' : '';
 		return (
 			<div className="recipe" >
 				<div className="recipe-name-bar" >
 					<RecipeSmall recipe={this.props.recipe} rootElement={this.props.rootElement} />
 					<div className="recipe-buttons">
-						<button onClick={this.goToEditMode}>edit</button>
-						<button>herp-a-derp</button>
+						<button onClick={this.goToEditMode} className={subduedButton}>edit</button>
+						<button onClick={this.confirmDelete}>delete</button>
 					</div>
 				</div>
-				<RecipeDetails recipe={this.props.recipe} />;
+				<RecipeDetails recipe={this.props.recipe} />
 			</div>
 		);
 	}
@@ -146,7 +177,7 @@ var RecipeEdit = React.createClass({
 	},
 	updateIngredientItem: function(index) {
 		return function(event) {
-			var newIngredientState = this.state.ingredients;;
+			var newIngredientState = this.state.ingredients;
 			newIngredientState[index] = event.target.value;
 			this.setState({ingredients: newIngredientState})
 		}.bind(this)
@@ -165,6 +196,18 @@ var RecipeEdit = React.createClass({
 			console.log(this.state);
 		}.bind(this);
 		
+	},
+	addIngredientItem: function() {
+		
+		var newIngredients = this.state.ingredients.slice(0);
+		newIngredients.push('boop');
+		this.setState({ingredients: newIngredients})
+		
+	},
+	transformToMaximized: function() {
+		
+		this.props.rootElement.props.editState(false);
+		this.props.rootElement.setDisplayType('maximized');
 	},
 	cancelEdit: function() {
 		// disregard current state of this element and switch to a non-edit view
@@ -185,17 +228,19 @@ var RecipeEdit = React.createClass({
 			// delete the recipe
 			// the following setDisplayType might need be moved to the previous if
 		}
-		this.props.rootElement.setDisplayType('maximized');
+		this.transformToMaximized();
 	},
 	saveEdit: function() {
 		// validate that data exists
 		// remove blank ingredient entries
 		
 		// update root's data
-		this.props.rootElement.setDisplayType('maximized');
-		
+		console.log('saving...');
 		var newRecipe = new RecipeDataItem(this.state.name, this.state.ingredients, this.state.directions);
+		
+		console.log('saving...' + newRecipe['ingredients']);
 		this.props.rootElement.props.updateRecipeData(newRecipe);
+		this.transformToMaximized();
 	},
 	render: function() {
 		// value from 'props' was the saved/original value, value in 'state' is the unsaved value
@@ -216,12 +261,15 @@ var RecipeEdit = React.createClass({
 				<div>RECIPE NAME</div>
 				<input type="text" name="recipe-name" value={this.state.name} onChange={this.updateRecipeName} />
 				<div>RECIPE INGREDIENTS</div>
-				<div>{ingredientChildren}</div> 
+				<div>
+					{ingredientChildren}
+					<button type="button" onClick={this.addIngredientItem}>new ingredient</button> 
+				</div> 
 				<div>RECIPE DIRECTIONS</div>
 				<input type="text" name="recipe-directions" value={this.state.directions} onChange={this.updateRecipeDirections} />
 				<br />
-				<button type="button" onClick={this.cancelEdit}>cancel</button>
 				<button type="button" onClick={this.saveEdit}>save</button>
+				<button type="button" onClick={this.cancelEdit}>cancel</button>
 			</form>
 		);
 	}
@@ -234,9 +282,22 @@ var RecipeEdit = React.createClass({
 // 'edit' : can edit or delete the entry
 var RecipeItem = React.createClass({
 	getInitialState: function() {
+		var recipeData;
+		var displayFormat;
+		if (this.props.recipe === undefined) {
+			var blankRecipe = new RecipeDataItem('burger', ['first', 'second', 'third'], 'cook it until edible');
+			recipeData = blankRecipe;
+			displayFormat = 'edit';
+		} else {
+			recipeData = this.props.recipe;
+			displayFormat = 'minimized';
+		}
+		
 		return {
-			validDisplayFormats: ['minimized', 'maximized', 'edit'],
-			displayFormat: 'minimized',
+			// the `delete` display format isn't a real view, instead it's used as part of the rube goldberg machine that deletes recipes
+			validDisplayFormats: ['minimized', 'maximized', 'edit', 'delete'],
+			displayFormat: displayFormat,
+			recipe: recipeData,
 		}
 	},
 	setDisplayType: function(type) {
@@ -245,18 +306,25 @@ var RecipeItem = React.createClass({
 			console.log(type, 'is not a valid display format, must be one of', this.sate.validdisplayFormats);
 			return;
 		}
+		if (type === 'delete') {
+			this.props.updateRecipeData('delete');
+			return;
+		}
 		this.setState({displayFormat: type});
+		if (type === 'edit') {
+			this.props.editState(true);
+		}
 	},
 	render: function() {
 		var formatType = this.state.displayFormat;
 		if (formatType === 'minimized') {
-			return <RecipeSmall recipe={this.props.recipe} rootElement={this} />
+			return <RecipeSmall recipe={this.state.recipe} rootElement={this} />
 		}
 		if (formatType === 'maximized') {
-			return <RecipeBig recipe={this.props.recipe} rootElement={this} />
+			return <RecipeBig recipe={this.state.recipe} rootElement={this} />
 		}
 		if (formatType === 'edit') {
-			return <RecipeEdit recipe={this.props.recipe} rootElement={this} updateRecipeData={this.props.updateRecipeData} />
+			return <RecipeEdit recipe={this.state.recipe} rootElement={this} updateRecipeData={this.props.updateRecipeData} />
 		}
 		
 		console.log("unrecognized displayState, please check possible RecipeItem state names");
@@ -268,31 +336,106 @@ var RecipeItem = React.createClass({
 
 var RecipeContainer = React.createClass({
 	getInitialState: function() {
-		// recipeData is a global variable
-		return {recipeData: recipeData}
+		
+		var recipeData = [];
+		//console.log(localStorage.getItem('recipe data'))
+		//localStorage.clear();
+		
+		if(localStorage.getItem('recipe data') !== null){
+			// local storage exists
+			console.log('thanks for coming back :D');
+			recipeData = JSON.parse(localStorage.getItem('recipe data'));
+		} else {
+			// load the default recipes
+			console.log('welcome to the recipe app');
+			recipeData.push(new RecipeDataItem('pizza', ['first', 'second', 'third'], 'cook it until edible'));
+			recipeData.push(new RecipeDataItem('spaghetti', ['first', 'second', 'third'], 'cook it until edible'));
+			recipeData.push(new RecipeDataItem('pancakes', ['first', 'second', 'third'], 'cook it until edible'));
+			
+			localStorage.setItem('recipe data', JSON.stringify(recipeData));
+		}
+		
+		console.log(JSON.parse(localStorage.getItem('recipe data')));
+		return {
+			recipeData: recipeData,
+			editState: false,
+		} 
+	},
+	editState: function(bool) {
+		//set or check if any recipe is currently being editted
+		//only one recipe should be editted at a time, since the current save button would write every recipe string into local storage
+		if (arguments.length === 0) {
+			return this.state.editState;
+		} else {
+			this.setState({editState: bool})
+		}
 	},
 	updateRecipeData: function(index) {
 		return function(recipe) {
-			var newData = this.state.recipeData;
-			newData[index] = recipe;
+			
+			
+			
+			
+			console.log('attempting to save ' + recipe + ' in index ' + index);
+			var newData = this.state.recipeData.slice(0);
+			
+			
+			for (var key in newData) {
+				console.log(key, ":", recipe[key]);
+			}
+			
+			
+			if (recipe === 'delete') {
+				console.log('deleting...')
+				newData = newData.filter(function(el, indx, arr) {return indx !== index});
+			} else {
+				newData[index] = recipe;
+			}
+			console.log('data same:', this.state.recipeData == newData);
 			this.setState({recipeData: newData})
+			localStorage.setItem('recipe data', JSON.stringify(newData));
 			
 		}.bind(this)
 		
 		
 	},
+	newBlankRecipe: function() {
+		
+		
+		
+		console.log("creating a new blank recipe...");
+		var newRecipeState = this.state.recipeData;
+		
+		var blankRecipe = undefined;
+		newRecipeState.push(blankRecipe);
+		
+		
+		this.editState(true);
+		this.setState({recipeData: newRecipeState}); 
+	},
 	render: function() {
+		var editState = this.editState;
 		var updateFunction = this.updateRecipeData;
 		var recipeEntries = this.state.recipeData.map(function(entry, index) {
+			var keyValue = (entry === undefined)? "newRecipe" : entry.name; 
 			return (
-				<RecipeItem recipe={entry} key={index} updateRecipeData={updateFunction(index)} />
+				<RecipeItem recipe={entry} key={keyValue} updateRecipeData={updateFunction(index)} editState={editState} />
 			);
 		});
+		var newRecipeButton;
+		if (this.editState() === false) {
+			newRecipeButton = <button onClick={this.newBlankRecipe} id={"button-add-new"} >ADD NEW</button>
+		}
 		return (
-			<div>{recipeEntries}</div>
+			<div>
+				{recipeEntries}
+				{newRecipeButton}
+				<button onClick={hardReset} id={'button-reset-app'} >Reset App</button>
+			</div>
+			
 		);
 	}
-});
+}); 
 
 
 
