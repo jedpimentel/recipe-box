@@ -236,9 +236,8 @@ var RecipeEdit = React.createClass({
 	},
 	addIngredientItem: function addIngredientItem() {
 
-		var newIngredients = this.state.ingredients.slice(0);
-		newIngredients.push('boop');
-		this.setState({ ingredients: newIngredients });
+		var emptyIngredient = ['boop'];
+		this.setState({ ingredients: this.state.ingredients.concat(emptyIngredient) });
 	},
 	transformToMaximized: function transformToMaximized() {
 
@@ -272,9 +271,9 @@ var RecipeEdit = React.createClass({
 
 		// update root's data
 		console.log('saving...');
-		var newRecipe = new RecipeDataItem(this.state.name, this.state.ingredients, this.state.directions);
+		var newRecipe = new RecipeDataItem(this.state.name, this.state.ingredients.slice(0), this.state.directions);
 
-		console.log('saving...' + newRecipe['ingredients']);
+		console.log('saving...');
 		this.props.rootElement.props.updateRecipeData(newRecipe);
 		this.transformToMaximized();
 	},
@@ -350,6 +349,7 @@ var RecipeItem = React.createClass({
 	displayName: "RecipeItem",
 
 	getInitialState: function getInitialState() {
+		console.log('rendering container', this.props.recipe);
 		var recipeData;
 		var displayFormat;
 		if (this.props.recipe === undefined) {
@@ -384,15 +384,16 @@ var RecipeItem = React.createClass({
 		}
 	},
 	render: function render() {
+		// I has used 'state' instead of 'prop' when sending values to the recepies, this caused a huge bug where the ingredient list sizes wheren't updated when a list item was added or removed, even though text changes had no issue.
 		var formatType = this.state.displayFormat;
 		if (formatType === 'minimized') {
-			return React.createElement(RecipeSmall, { recipe: this.state.recipe, rootElement: this });
+			return React.createElement(RecipeSmall, { recipe: this.props.recipe, rootElement: this });
 		}
 		if (formatType === 'maximized') {
-			return React.createElement(RecipeBig, { recipe: this.state.recipe, rootElement: this });
+			return React.createElement(RecipeBig, { recipe: this.props.recipe, rootElement: this });
 		}
 		if (formatType === 'edit') {
-			return React.createElement(RecipeEdit, { recipe: this.state.recipe, rootElement: this, updateRecipeData: this.props.updateRecipeData });
+			return React.createElement(RecipeEdit, { recipe: this.props.recipe, rootElement: this, updateRecipeData: this.props.updateRecipeData });
 		}
 
 		console.log("unrecognized displayState, please check possible RecipeItem state names");
@@ -442,13 +443,11 @@ var RecipeContainer = React.createClass({
 		return function (recipe) {
 
 			console.log('attempting to save ' + recipe + ' in index ' + index);
+
 			var newData = this.state.recipeData.slice(0);
 
-			for (var key in newData) {
-				console.log(key, ":", recipe[key]);
-			}
-
 			if (recipe === 'delete') {
+				// replacing the recipe data with a 'delete' string means use clicked the 'delete' button
 				console.log('deleting...');
 				newData = newData.filter(function (el, indx, arr) {
 					return indx !== index;
@@ -456,7 +455,6 @@ var RecipeContainer = React.createClass({
 			} else {
 				newData[index] = recipe;
 			}
-			console.log('data same:', this.state.recipeData == newData);
 			this.setState({ recipeData: newData });
 			localStorage.setItem('recipe data', JSON.stringify(newData));
 		}.bind(this);
@@ -477,6 +475,7 @@ var RecipeContainer = React.createClass({
 		var updateFunction = this.updateRecipeData;
 		var recipeEntries = this.state.recipeData.map(function (entry, index) {
 			var keyValue = entry === undefined ? "newRecipe" : entry.name;
+			console.log('rendering', entry);
 			return React.createElement(RecipeItem, { recipe: entry, key: keyValue, updateRecipeData: updateFunction(index), editState: editState });
 		});
 		var newRecipeButton;
