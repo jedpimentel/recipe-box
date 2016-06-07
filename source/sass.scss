@@ -1,0 +1,140 @@
+
+
+$mobile-width: 25em;
+$color-main-light: #DDD;
+$color-main-mid: #AAA;
+$color-main-dark: #888;
+
+* {
+	border: 1px solid black;
+	padding: 1px;
+}
+
+body {
+	text-align: center;
+}
+
+/*main container for the app*/
+#main {
+	width: 50em;
+	max-width: 100%;
+	display: inline-block;
+}
+
+
+
+.recipe {
+	
+	border: 2px solid green; 
+	
+	.recipe-details {
+		display: inline-block;
+		width: 100%;
+		border: 1px solid orange;
+		
+		ul {
+			display: inline-block;
+			margin: 0;
+			height: 100%;
+			list-style-position: inside;
+			
+		}
+		
+		
+		/* ingredient list */
+		.recipe-ingredients {
+			float: left;
+			display: inline-block;
+			background: blue;
+			width: 50%;
+			
+
+		} 
+		
+		.recipe-directions {
+			float: right;
+			display: inline-block;
+			width: calc( 50% - 8px ); /* FIX THIS LATER !!!! !!!! !!!! */
+			height: 100%;
+			background: green;
+			padding-top: 0.5em;
+		}
+	}
+	
+	
+}
+
+
+
+
+.recipe-name {
+	background-color: $color-main-mid;
+	h2 {
+	margin: 0;
+	}
+	&:hover{
+		background-color: $color-main-light;
+	}
+}
+
+
+
+.recipe-name-bar {
+	$buttons-group-width: 10em;
+	padding: 0;
+
+	.recipe-name { 
+		 
+		display: inline-block;
+		width: calc( 100% - #{$buttons-group-width} - 8px );  
+		margin: 0;
+		padding: 0;
+		h2 {
+			margin: 0;
+			padding: 0;
+		}
+	}	
+	.recipe-buttons {
+		float: right;
+		display: inline-block;
+		
+		border: 1px solid red;
+		width: $buttons-group-width;
+		@media (max-width: $mobile-width) {
+			width: 100%;
+		}
+		button {
+			width: 50%;
+			@media (max-width: $mobile-width) {
+				font-size: 60%;
+			}
+		}
+	}
+}
+
+
+
+#button-add-new {
+	width: 100%;
+}
+#button-reset-app {
+	float: right;
+}
+
+.subdued-button {
+	background-color: #AAA;
+	color: #BBB;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

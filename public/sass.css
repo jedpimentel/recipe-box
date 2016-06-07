@@ -1,0 +1,81 @@
+* {
+  border: 1px solid black;
+  padding: 1px; }
+
+body {
+  text-align: center; }
+
+/*main container for the app*/
+#main {
+  width: 50em;
+  max-width: 100%;
+  display: inline-block; }
+
+.recipe {
+  border: 2px solid green; }
+  .recipe .recipe-details {
+    display: inline-block;
+    width: 100%;
+    border: 1px solid orange;
+    /* ingredient list */ }
+    .recipe .recipe-details ul {
+      display: inline-block;
+      margin: 0;
+      height: 100%;
+      list-style-position: inside; }
+    .recipe .recipe-details .recipe-ingredients {
+      float: left;
+      display: inline-block;
+      background: blue;
+      width: 50%; }
+    .recipe .recipe-details .recipe-directions {
+      float: right;
+      display: inline-block;
+      width: calc( 50% - 8px );
+      /* FIX THIS LATER !!!! !!!! !!!! */
+      height: 100%;
+      background: green;
+      padding-top: 0.5em; }
+
+.recipe-name {
+  background-color: #AAA; }
+  .recipe-name h2 {
+    margin: 0; }
+  .recipe-name:hover {
+    background-color: #DDD; }
+
+.recipe-name-bar {
+  padding: 0; }
+  .recipe-name-bar .recipe-name {
+    display: inline-block;
+    width: calc( 100% - 10em - 8px );
+    margin: 0;
+    padding: 0; }
+    .recipe-name-bar .recipe-name h2 {
+      margin: 0;
+      padding: 0; }
+  .recipe-name-bar .recipe-buttons {
+    float: right;
+    display: inline-block;
+    border: 1px solid red;
+    width: 10em; }
+    @media (max-width: 25em) {
+      .recipe-name-bar .recipe-buttons {
+        width: 100%; } }
+    .recipe-name-bar .recipe-buttons button {
+      width: 50%; }
+      @media (max-width: 25em) {
+        .recipe-name-bar .recipe-buttons button {
+          font-size: 60%; } }
+
+#button-add-new {
+  width: 100%; }
+
+#button-reset-app {
+  float: right; }
+
+.subdued-button {
+  background-color: #AAA;
+  color: #BBB; }
+
+/*# sourceMappingURL=sass.css.map */
