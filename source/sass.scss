@@ -1,9 +1,17 @@
-
+/*
+	color scheme ideas:
+*/
 
 $mobile-width: 25em;
+$color-main-white: white;
 $color-main-light: #DDD;
 $color-main-mid: #AAA;
 $color-main-dark: #888;
+$color-main-black: #222;
+
+
+$color-main-edit: #79f;
+$color-main-delete: #f97;
 
 * {
 	border: 1px solid black;
@@ -19,6 +27,7 @@ body {
 	width: 50em;
 	max-width: 100%;
 	display: inline-block;
+	font-size: 100%;
 }
 
 
@@ -26,38 +35,82 @@ body {
 .recipe {
 	
 	border: 2px solid green; 
+	background-color: $color-main-mid;
+	margin-top: 1em;
+	margin-bottom: 1em;
 	
-	.recipe-details {
+	.recipe-details { 
 		display: inline-block;
 		width: 100%;
 		border: 1px solid orange;
 		
 		ul {
 			display: inline-block;
-			margin: 0;
+			
 			height: 100%;
 			list-style-position: inside;
 			
 		}
 		
+		/*used for ingredient list and directions box */
+		$detail-group-margin: 0.25em;
 		
 		/* ingredient list */
 		.recipe-ingredients {
 			float: left;
 			display: inline-block;
-			background: blue;
-			width: 50%;
+			background-color: $color-main-light;
+			margin: $detail-group-margin;
+			width: calc( 50% - ( #{$detail-group-margin} * 2 ));
+			@media (max-width: $mobile-width ) {
+				width: calc( 100% - ( #{$detail-group-margin} * 2 ));
+			}
 			
-
+			
+			$button-ingredient-delete-width: 3.5em;
+			.edit-ingreient {
+				width: calc( 100% - #{$button-ingredient-delete-width} - 4px );
+			}
+			.button-ingredient-delete {
+				width: $button-ingredient-delete-width;
+				
+				
+				
+				
+			}
+			
+			
+			
+			
+			.button-ingredient-new {
+				width: 100%;
+			}
+			
 		} 
 		
 		.recipe-directions {
+			background-color: $color-main-light;
 			float: right;
 			display: inline-block;
-			width: calc( 50% - 8px ); /* FIX THIS LATER !!!! !!!! !!!! */
+			min-height: 2em;
+			margin: $detail-group-margin;
+			width: calc( 50% - ( #{$detail-group-margin} * 2 ) - 8px ); /* FIX THIS LATER !!!! !!!! !!!! */
+			@media (max-width: $mobile-width) {
+				width: calc( 100% - ( #{$detail-group-margin} * 2 ));
+			}
+			
 			height: 100%;
-			background: green;
-			padding-top: 0.5em;
+			
+			.recipe-directions-edit {
+				/*is a <textarea> */
+				width: calc( 100% - 8px - 0.5em - 0.5em); /* replace with variables */
+				min-height: 10em;
+				@media (max-width: $mobile-width) {
+					width: 100%;
+				}
+				padding: 0.5em;
+				resize: vertical;
+			}
 		}
 	}
 	
@@ -68,12 +121,14 @@ body {
 
 
 .recipe-name {
-	background-color: $color-main-mid;
+	background-color: $color-main-light;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 	h2 {
 	margin: 0;
 	}
 	&:hover{
-		background-color: $color-main-light;
+		background-color: $color-main-white;
 	}
 }
 
@@ -87,6 +142,9 @@ body {
 		 
 		display: inline-block;
 		width: calc( 100% - #{$buttons-group-width} - 8px );  
+		@media (max-width: $mobile-width) {
+			width: 100%;
+		}
 		margin: 0;
 		padding: 0;
 		h2 {
@@ -126,7 +184,30 @@ body {
 	color: #BBB;
 }
 
+/* save and cancel buttons when editing */
+.chunky-button {
+	font-size: 125%;
+	padding: 0.25em;
+	margin: 0.25em;
+	border-radius: 0.50em;
+	
+	&.button-save {
+		background-color: $color-main-edit;
+	}
+	
+	&.button-cancel {
+		background-color: $color-main-delete;
+	}
+	
+}
 
+.button-edit {
+	background-color: $color-main-edit;
+}
+
+.button-delete {
+	background-color: $color-main-delete;
+}
 
 
 
