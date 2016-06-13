@@ -77,6 +77,24 @@ body {
   .recipe-name:hover {
     background-color: white; }
 
+.edit-recipe-title {
+  width: 100%;
+  /* text that says "RECIPE NAME:" */ }
+  .edit-recipe-title .edit-recipe-title-instructions {
+    background-color: #DDD;
+    display: inline-block;
+    width: 8em; }
+    @media (max-width: 25em) {
+      .edit-recipe-title .edit-recipe-title-instructions {
+        width: 100%; } }
+  .edit-recipe-title .edit-recipe-title-field {
+    display: inline-block;
+    /* TODO: make it pixerl perfect */
+    width: calc( 90% - 8em ); }
+    @media (max-width: 25em) {
+      .edit-recipe-title .edit-recipe-title-field {
+        width: 100%; } }
+
 .recipe-name-bar {
   padding: 0; }
   .recipe-name-bar .recipe-name {
@@ -119,7 +137,8 @@ body {
   font-size: 125%;
   padding: 0.25em;
   margin: 0.25em;
-  border-radius: 0.50em; }
+  border-radius: 0.50em;
+  width: 5em; }
   .chunky-button.button-save {
     background-color: #79f; }
   .chunky-button.button-cancel {
@@ -130,5 +149,11 @@ body {
 
 .button-delete {
   background-color: #f97; }
+
+.no-padding {
+  padding: 0; }
+
+.no-margin {
+  margin: 0; }
 
 /*# sourceMappingURL=sass.css.map */

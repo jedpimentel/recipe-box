@@ -32,6 +32,7 @@ body {
 
 
 
+
 .recipe {
 	
 	border: 2px solid green; 
@@ -133,6 +134,28 @@ body {
 }
 
 
+.edit-recipe-title {
+	width: 100%;
+	/* text that says "RECIPE NAME:" */
+	$recipe-title-instructions-width: 8em;
+	.edit-recipe-title-instructions {
+		background-color: $color-main-light;
+		display: inline-block;
+		width: $recipe-title-instructions-width;
+		@media (max-width: $mobile-width) {
+			width: 100%;
+		}
+	}
+	.edit-recipe-title-field {
+		display: inline-block;
+		/* TODO: make it pixerl perfect */
+		width: calc( 90% - #{$recipe-title-instructions-width} ); 
+		@media (max-width: $mobile-width) {
+			width: 100%;
+		}
+	}
+}
+
 
 .recipe-name-bar {
 	$buttons-group-width: 10em;
@@ -190,6 +213,7 @@ body {
 	padding: 0.25em;
 	margin: 0.25em;
 	border-radius: 0.50em;
+	width: 5em;
 	
 	&.button-save {
 		background-color: $color-main-edit;
@@ -209,8 +233,12 @@ body {
 	background-color: $color-main-delete;
 }
 
-
-
+.no-padding {
+	padding: 0;
+}
+.no-margin {
+	margin: 0;
+}
 
 
 

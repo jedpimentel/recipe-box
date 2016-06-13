@@ -206,10 +206,6 @@ var RecipeEdit = React.createClass({
 			'ingredients': initialIngredients
 		};
 	},
-	handleChange: function handleChange(event) {
-		goBoopBeep();
-		this.setState({});
-	},
 	updateRecipeName: function updateRecipeName(event) {
 		goBoopBeep();
 		this.setState({ name: event.target.value });
@@ -256,9 +252,10 @@ var RecipeEdit = React.createClass({
 
 		// if this was an existing recipe (else assume it was a new/tentative recipe)
 		console.log(this.props);
-		if (this.props.hasOwnProperty('recipe')) {
+		if (this.props.recipe.name !== '') {
 			// revert to orinal state
 			this.setState({
+				// TODO: check these for unnecessary redundancy
 				'recipe': this.props.recipe,
 				'name': this.props.recipe.name,
 				'directions': this.props.recipe.directions,
@@ -267,6 +264,8 @@ var RecipeEdit = React.createClass({
 		} else {
 			// delete the recipe
 			// the following setDisplayType might need be moved to the previous if
+			// !important
+			this.props.rootElement.setDisplayType('delete');
 		}
 		this.transformToMaximized();
 	},
@@ -276,7 +275,18 @@ var RecipeEdit = React.createClass({
 
 		// update root's data
 		console.log('saving...');
-		var newRecipe = new RecipeDataItem(this.state.name, this.state.ingredients.slice(0), this.state.directions);
+		var newRecipe = new RecipeDataItem(this.state.name.trim(), this.state.ingredients.slice(0).map(function (el, indx) {
+			return el.trim();
+		}).filter(function (el) {
+			return el !== '';
+		}), this.state.directions.trim());
+
+		if (newRecipe.name.length === 0 || newRecipe.ingredients.length === 0 || newRecipe.directions.length === 0) {
+			// there is blank data, recipe is invalid
+			var alertText = "Please be check if you have the whole written down." + (newRecipe.name.length === 0 ? "\nThe Recipe has no name." : "") + (newRecipe.ingredients.length === 0 ? "\nThe recipe needs at least one ingredient." : "") + (newRecipe.directions.length === 0 ? "\nThe recipe needs instructions" : "");
+			alert(alertText);
+			return;
+		}
 
 		console.log('saving...');
 		this.props.rootElement.props.updateRecipeData(newRecipe);
@@ -292,7 +302,7 @@ var RecipeEdit = React.createClass({
 			return React.createElement(
 				"div",
 				{ key: keyName, index: index },
-				React.createElement("input", { className: 'edit-ingreient', type: "text", name: "recipe-ingredient-" + index, value: item, onChange: updateIngredientItem(index) }),
+				React.createElement("input", { className: 'edit-ingreient', placeholder: "ENTER INGREDIENT", type: "text", name: "recipe-ingredient-" + index, value: item, onChange: updateIngredientItem(index) }),
 				React.createElement(
 					"button",
 					{ className: 'button-ingredient-delete', type: "button", onClick: removeIngredientItem(index), ingredientIndex: index },
@@ -305,14 +315,19 @@ var RecipeEdit = React.createClass({
 			"form",
 			{ className: "recipe" },
 			React.createElement(
+				"h2",
+				{ className: "no-padding no-margin" },
+				"Edit Recipe!"
+			),
+			React.createElement(
 				"div",
-				null,
+				{ className: "edit-recipe-title" },
 				React.createElement(
-					"span",
-					null,
-					"RECIPE NAME  :  "
+					"div",
+					{ className: "edit-recipe-title-instructions" },
+					"RECIPE NAME:"
 				),
-				React.createElement("input", { type: "text", name: "recipe-name", value: this.state.name, onChange: this.updateRecipeName })
+				React.createElement("input", { className: "edit-recipe-title-field", placeholder: "ENTER RECIPE NAME", type: "text", name: "recipe-name", value: this.state.name, onChange: this.updateRecipeName })
 			),
 			React.createElement(
 				"div",
@@ -344,7 +359,7 @@ var RecipeEdit = React.createClass({
 						null,
 						"RECIPE DIRECTIONS"
 					),
-					React.createElement("textarea", { className: "recipe-directions-edit", type: "text", name: "recipe-directions", value: this.state.directions, onChange: this.updateRecipeDirections })
+					React.createElement("textarea", { className: "recipe-directions-edit", placeholder: "ENTER PREPERATION INSTRUCTIONS", type: "text", name: "recipe-directions", value: this.state.directions, onChange: this.updateRecipeDirections })
 				)
 			),
 			React.createElement("br", null),
@@ -372,24 +387,21 @@ var RecipeItem = React.createClass({
 
 	getInitialState: function getInitialState() {
 		console.log('rendering container', this.props.recipe);
-		var recipeData;
 		var displayFormat;
 		if (this.props.recipe === undefined) {
-			var blankRecipe = new RecipeDataItem('burger', ['first', 'second', 'third'], 'cook it until edible');
-			recipeData = blankRecipe;
+			console.log('suposedly undefined:', this.props.recipe);
 			displayFormat = 'edit';
 		} else {
-			recipeData = this.props.recipe;
 			displayFormat = 'minimized';
 		}
 
 		return {
 			// the `delete` display format isn't a real view, instead it's used as part of the rube goldberg machine that deletes recipes
 			validDisplayFormats: ['minimized', 'maximized', 'edit', 'delete'],
-			displayFormat: displayFormat,
-			recipe: recipeData
+			displayFormat: displayFormat
 		};
 	},
+	// recipe: recipeData,
 	setDisplayType: function setDisplayType(type) {
 		console.log('setting diplay type');
 		if (this.state.validDisplayFormats.indexOf(type) === -1) {
@@ -407,7 +419,7 @@ var RecipeItem = React.createClass({
 	},
 	render: function render() {
 		// I has used 'state' instead of 'prop' when sending values to the recepies, this caused a huge bug where the ingredient list sizes wheren't updated when a list item was added or removed, even though text changes had no issue. Then I couldn't add new recipies until I reverted <RecipeEdit> to use state. But then starting a second edit in a same version reverted the first edit's changes, apparently since it was keeping the previous state. ended up moving them all to use props, moving the blank recipe here instead of inside the RecipeEdit
-		var blankRecipe = new RecipeDataItem('burger', ['first', 'second', 'third'], 'cook it until edible');
+		var blankRecipe = new RecipeDataItem('', ['', '', ''], '');
 		var recipe = this.props.recipe !== undefined ? this.props.recipe : blankRecipe;
 		var formatType = this.state.displayFormat;
 		if (formatType === 'minimized') {
@@ -443,7 +455,7 @@ var RecipeContainer = React.createClass({
 			console.log('welcome to the recipe app');
 			recipeData.push(new RecipeDataItem('pizza', ['first', 'second', 'third'], 'cook it until edible'));
 			recipeData.push(new RecipeDataItem('spaghetti', ['first', 'second', 'third'], 'cook it until edible'));
-			recipeData.push(new RecipeDataItem('pancakes', ['first', 'second', 'third'], 'cook it until edible'));
+			recipeData.push(new RecipeDataItem('Pizza', ['phone', 'money'], 'Call pizza shop that has delivery service.\nPay money to delivery guy.'));
 
 			localStorage.setItem('recipe data', JSON.stringify(recipeData));
 		}
