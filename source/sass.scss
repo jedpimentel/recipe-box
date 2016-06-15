@@ -1,6 +1,7 @@
-/*
-	color scheme ideas:
-*/
+/**
+*
+*
+**/
 
 $mobile-width: 25em;
 $color-main-white: white;
@@ -9,6 +10,7 @@ $color-main-mid: #AAA;
 $color-main-dark: #888;
 $color-main-black: #222;
 
+$margin-thin: 0.25em;
 
 $color-main-edit: #79f;
 $color-main-delete: #f97;
@@ -34,6 +36,12 @@ h1 {
 }
 
 
+input {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
 .recipe {
 	
 	background-color: $color-main-mid;
@@ -57,7 +65,7 @@ h1 {
 		}
 		
 		/*used for ingredient list and directions box */
-		$detail-group-margin: 0.25em;
+		$detail-group-margin: $margin-thin;
 		
 		/* ingredient list */
 		.recipe-ingredients {
@@ -73,23 +81,16 @@ h1 {
 			}
 			
 			
-			$button-ingredient-delete-width: 3.5em;
+			$button-ingredient-delete-width: 4em;
 			.edit-ingreient {
 				width: calc( 100% - #{$button-ingredient-delete-width} - 4px );
 			}
 			.button-ingredient-delete {
 				width: $button-ingredient-delete-width;
 				
-				
-				
-				
 			}
-			
-			
-			
-			
 			.button-ingredient-new {
-				width: 100%;
+				width: calc( 100% - #{$margin-thin} );
 			}
 			
 		} 
@@ -141,32 +142,40 @@ h1 {
 
 
 
-
+/* there is another `.recipe-name group further down for when inside another class */
 .recipe-name {
 	display: block;
 	background-color: $color-main-light;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
-	height: $recipe-name-bar-height;
+	min-height: $recipe-name-bar-height;
 	h2 {
 	margin: 0;
 	
 	vertical-align: middle;
 	}
-	&:hover{
-		background-color: $color-main-white;
-		cursor: pointer;
+	
+	@media (hover) {
+		&:hover{
+			background-color: $color-main-white;
+			cursor: pointer;
+		}
 	}
 }
 
 
 .edit-recipe-title {
 	width: 100%;
-	/* text that says "RECIPE NAME:" */
+	margin: 0;
+	padding: 0;
 	$recipe-title-instructions-width: 8em;
+	
 	.edit-recipe-title-instructions {
+		/* text that says "RECIPE NAME:" */
 		background-color: $color-main-light;
 		display: inline-block;
+		padding: 0;
+		margin: 0;
 		width: $recipe-title-instructions-width;
 		@media (max-width: $mobile-width) {
 			width: 100%;
@@ -174,8 +183,12 @@ h1 {
 	}
 	.edit-recipe-title-field {
 		display: inline-block;
+		padding: 0;
+		margin: 0;
 		/* TODO: make it pixerl perfect */
-		width: calc( 90% - #{$recipe-title-instructions-width} ); 
+		
+		/*width is NOT pixel perfect, the 2em where thrown in there as a kludge */ 
+		width: calc( 100% - #{$recipe-title-instructions-width} - 2em ); 
 		@media (max-width: $mobile-width) {
 			width: 100%;
 		}
@@ -189,13 +202,14 @@ h1 {
 	margin: 0;
 	display: inline-block;
 	width: 100%;
-	height: $recipe-name-bar-height;
+	min-height: $recipe-name-bar-height;
+	background-color: $color-main-light;
 
 	.recipe-name { 
 		 
 		display: inline-block;
-		height: 100%;
-		width: calc( 100% - #{$buttons-group-width} );  
+		min-height: $recipe-name-bar-height;
+		min-width: calc( 100% - #{$buttons-group-width} );  
 		@media (max-width: $mobile-width) {
 			width: 100%;
 		}
@@ -209,18 +223,17 @@ h1 {
 	.recipe-buttons {
 		/*float: right;*/
 		display: inline-block;
-		height: 100%;
+		height: $recipe-name-bar-height;
 		
-		button {
-			height: 100%;
-		}
 		
 		
 		width: $buttons-group-width;
 		@media (max-width: $mobile-width) {
 			width: 100%;
+			height: calc( #{$recipe-name-bar-height} / 2 );
 		}
 		button {
+			height: 100%;
 			width: 50%;
 			@media (max-width: $mobile-width) {
 				font-size: 60%;
