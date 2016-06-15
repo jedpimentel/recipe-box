@@ -101,8 +101,10 @@ var RecipeBig = React.createClass({
 		console.log(this.state.clickCount);
 		if (this.props.rootElement.props.editState() === false) {
 			this.props.rootElement.setDisplayType('edit');
-		} else if (this.state.clickCount >= 4) {
-			alert('please save or cancel any pending edits before edditing another recipe');
+		} else if (this.state.clickCount >= 0) {
+			// `clickCount` was meant to be used so user would have to click the edit button a few times before the popu info appeared, felt like a cool idea at the time, but I set it to zero since it's a pretty weird feature to have.
+			
+			alert('please save or cancel any pending edits before editting another recipe. (the big blue button)');
 		} else {
 			this.setState({clickCount: this.state.clickCount + 1})
 		} 
@@ -124,14 +126,14 @@ var RecipeBig = React.createClass({
 	},
 	render: function() {
 		var thereIsAnActiveEditBox = this.props.rootElement.props.editState();
-		var subduedButton = thereIsAnActiveEditBox? 'subdued-button' : '';
+		var subduedButton = thereIsAnActiveEditBox? 'subdued-button' : 'button-edit';
 		return (
 			<div className="recipe" >
 				<div className="recipe-name-bar" >
 					<RecipeSmall recipe={this.props.recipe} rootElement={this.props.rootElement} />
 					<div className="recipe-buttons">
 						<button onClick={this.goToEditMode} className={subduedButton}>edit</button>
-						<button onClick={this.confirmDelete}>delete</button>
+						<button onClick={this.confirmDelete} className='button-delete'>delete</button>
 					</div>
 				</div>
 				<RecipeDetails recipe={this.props.recipe} />
@@ -147,11 +149,14 @@ var RecipeBig = React.createClass({
 //props=saved state=notSaved
 var RecipeEdit = React.createClass({
 	getInitialState: function() {
+		// TODO: remove `defaultRecipe` and related code, as recipe is now a guaranteed prop
+		
 		var defaultRecipe = new RecipeDataItem(
 		'name',
 		['ingredient1', 'ingredient2', 'ingredient3' ],
 		'description'
 		)
+		
 		var initialStateRecipe = ( this.props.hasOwnProperty('recipe') ? this.props.recipe : defaultRecipe );
 		var initialIngredients = initialStateRecipe.ingredients.slice();
 		
@@ -199,9 +204,9 @@ var RecipeEdit = React.createClass({
 	},
 	addIngredientItem: function() {
 		
-		var newIngredients = this.state.ingredients.slice(0);
-		newIngredients.push('boop');
-		this.setState({ingredients: newIngredients})
+		
+		var emptyIngredient = ['boop'];
+		this.setState({ingredients: this.state.ingredients.concat(emptyIngredient)})
 		
 	},
 	transformToMaximized: function() {
@@ -236,9 +241,9 @@ var RecipeEdit = React.createClass({
 		
 		// update root's data
 		console.log('saving...');
-		var newRecipe = new RecipeDataItem(this.state.name, this.state.ingredients, this.state.directions);
+		var newRecipe = new RecipeDataItem(this.state.name, this.state.ingredients.slice(0), this.state.directions);
 		
-		console.log('saving...' + newRecipe['ingredients']);
+		console.log('saving...');
 		this.props.rootElement.props.updateRecipeData(newRecipe);
 		this.transformToMaximized();
 	},
@@ -251,25 +256,34 @@ var RecipeEdit = React.createClass({
 			var keyName = recipeName + index;
 			return (
 				<div key={keyName} index={index} >
-					<input type="text" name={"recipe-ingredient-"+index} value={item} onChange={updateIngredientItem(index)} />
-					<button type="button" onClick={removeIngredientItem(index)} ingredientIndex={index}>delete</button>
+					<input className={'edit-ingreient'} type="text" name={"recipe-ingredient-"+index} value={item} onChange={updateIngredientItem(index)} />
+					<button className={'button-ingredient-delete'} type="button" onClick={removeIngredientItem(index)} ingredientIndex={index}>delete</button>
 				</div>
 			);
 		});
+		// the return structure shares  a lot fot he same classes that are used to format a mazimized view
 		return (
 			<form className="recipe" >
-				<div>RECIPE NAME</div>
-				<input type="text" name="recipe-name" value={this.state.name} onChange={this.updateRecipeName} />
-				<div>RECIPE INGREDIENTS</div>
 				<div>
-					{ingredientChildren}
-					<button type="button" onClick={this.addIngredientItem}>new ingredient</button> 
-				</div> 
-				<div>RECIPE DIRECTIONS</div>
-				<input type="text" name="recipe-directions" value={this.state.directions} onChange={this.updateRecipeDirections} />
+					<span>RECIPE NAME &nbsp;: &nbsp;</span> 
+					<input type="text" name="recipe-name" value={this.state.name} onChange={this.updateRecipeName} />
+				</div>
+				<div className="recipe-details">
+					<div className="recipe-ingredients">
+						<div>RECIPE INGREDIENTS</div>
+						<div>
+							{ingredientChildren}
+							<button className={'button-ingredient-new'} type="button" onClick={this.addIngredientItem}>new ingredient</button> 
+						</div>
+					</div>{/* .recipe-ingredients end */}
+					<div className="recipe-directions">
+						<div>RECIPE DIRECTIONS</div>
+						<textarea className={"recipe-directions-edit"} type={"text"} name={"recipe-directions"} value={this.state.directions} onChange={this.updateRecipeDirections} />
+					</div>{/* .recipe-directions end */}
+				</div>{/* .recipe-details end */}
 				<br />
-				<button type="button" onClick={this.saveEdit}>save</button>
-				<button type="button" onClick={this.cancelEdit}>cancel</button>
+				<button className="chunky-button button-save" type="button" onClick={this.saveEdit}>save</button>
+				<button className="chunky-button button-cancel" type="button" onClick={this.cancelEdit}>cancel</button>
 			</form>
 		);
 	}
@@ -282,6 +296,7 @@ var RecipeEdit = React.createClass({
 // 'edit' : can edit or delete the entry
 var RecipeItem = React.createClass({
 	getInitialState: function() {
+		console.log('rendering container', this.props.recipe); 
 		var recipeData;
 		var displayFormat;
 		if (this.props.recipe === undefined) {
@@ -316,20 +331,23 @@ var RecipeItem = React.createClass({
 		}
 	},
 	render: function() {
+		// I has used 'state' instead of 'prop' when sending values to the recepies, this caused a huge bug where the ingredient list sizes wheren't updated when a list item was added or removed, even though text changes had no issue. Then I couldn't add new recipies until I reverted <RecipeEdit> to use state. But then starting a second edit in a same version reverted the first edit's changes, apparently since it was keeping the previous state. ended up moving them all to use props, moving the blank recipe here instead of inside the RecipeEdit
+		var blankRecipe = new RecipeDataItem('burger', ['first', 'second', 'third'], 'cook it until edible');
+		var recipe = (this.props.recipe !== undefined)? this.props.recipe : blankRecipe;
 		var formatType = this.state.displayFormat;
 		if (formatType === 'minimized') {
-			return <RecipeSmall recipe={this.state.recipe} rootElement={this} />
+			return <RecipeSmall recipe={recipe} rootElement={this} />
 		}
 		if (formatType === 'maximized') {
-			return <RecipeBig recipe={this.state.recipe} rootElement={this} />
+			return <RecipeBig recipe={recipe} rootElement={this} />
 		}
 		if (formatType === 'edit') {
-			return <RecipeEdit recipe={this.state.recipe} rootElement={this} updateRecipeData={this.props.updateRecipeData} />
-		}
+			return <RecipeEdit recipe={recipe} rootElement={this} updateRecipeData={this.props.updateRecipeData} />
+		} 
 		
 		console.log("unrecognized displayState, please check possible RecipeItem state names");
 		return (
-			<RecipeBig recipe={this.props.recipe} />
+			<RecipeBig recipe={recipe} />
 		);
 	}
 });
@@ -377,24 +395,21 @@ var RecipeContainer = React.createClass({
 			
 			
 			console.log('attempting to save ' + recipe + ' in index ' + index);
+			
 			var newData = this.state.recipeData.slice(0);
 			
 			
-			for (var key in newData) {
-				console.log(key, ":", recipe[key]);
-			}
-			
-			
 			if (recipe === 'delete') {
+				// replacing the recipe data with a 'delete' string means use clicked the 'delete' button
 				console.log('deleting...')
 				newData = newData.filter(function(el, indx, arr) {return indx !== index});
 			} else {
 				newData[index] = recipe;
+				
 			}
-			console.log('data same:', this.state.recipeData == newData);
 			this.setState({recipeData: newData})
 			localStorage.setItem('recipe data', JSON.stringify(newData));
-			
+			 
 		}.bind(this)
 		
 		
@@ -404,7 +419,7 @@ var RecipeContainer = React.createClass({
 		
 		
 		console.log("creating a new blank recipe...");
-		var newRecipeState = this.state.recipeData;
+		var newRecipeState = this.state.recipeData.slice(0);
 		
 		var blankRecipe = undefined;
 		newRecipeState.push(blankRecipe);
@@ -418,6 +433,7 @@ var RecipeContainer = React.createClass({
 		var updateFunction = this.updateRecipeData;
 		var recipeEntries = this.state.recipeData.map(function(entry, index) {
 			var keyValue = (entry === undefined)? "newRecipe" : entry.name; 
+			console.log('rendering', entry);
 			return (
 				<RecipeItem recipe={entry} key={keyValue} updateRecipeData={updateFunction(index)} editState={editState} />
 			);
