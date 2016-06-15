@@ -1,10 +1,6 @@
 /*
 	color scheme ideas:
 */
-* {
-  border: 1px solid black;
-  padding: 1px; }
-
 body {
   text-align: center; }
 
@@ -15,23 +11,31 @@ body {
   display: inline-block;
   font-size: 100%; }
 
+h1 {
+  padding: 0;
+  margin: 0; }
+
 .recipe {
-  border: 2px solid green;
   background-color: #AAA;
   margin-top: 1em;
   margin-bottom: 1em; }
   .recipe .recipe-details {
     display: inline-block;
     width: 100%;
-    border: 1px solid orange;
+    padding: 0;
+    vertical-align: top;
     /*used for ingredient list and directions box */
     /* ingredient list */ }
     .recipe .recipe-details ul {
       display: inline-block;
-      height: 100%;
-      list-style-position: inside; }
+      list-style-position: inside;
+      padding: 0; }
+    .recipe .recipe-details li {
+      border-bottom: 1px solid #888; }
     .recipe .recipe-details .recipe-ingredients {
-      float: left;
+      /*float: left;*/
+      /* for some reason this sticks to bottom if vert align isn't specified to top */
+      vertical-align: top;
       display: inline-block;
       background-color: #DDD;
       margin: 0.25em;
@@ -45,22 +49,30 @@ body {
         width: 3.5em; }
       .recipe .recipe-details .recipe-ingredients .button-ingredient-new {
         width: 100%; }
+    .recipe .recipe-details textarea {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      width: 100%;
+      padding-bottom: 0.5em;
+      heght: auto;
+      resize: none; }
     .recipe .recipe-details .recipe-directions {
+      text-align: left;
       background-color: #DDD;
-      float: right;
+      /*float: right;*/
       display: inline-block;
       min-height: 2em;
       margin: 0.25em;
-      width: calc( 50% - ( 0.25em * 2 ) - 8px );
-      /* FIX THIS LATER !!!! !!!! !!!! */
+      width: calc( 50% - ( 0.25em * 2 ) );
       height: 100%; }
       @media (max-width: 25em) {
         .recipe .recipe-details .recipe-directions {
           width: calc( 100% - ( 0.25em * 2 )); } }
+      .recipe .recipe-details .recipe-directions div {
+        margin: 0.5em; }
       .recipe .recipe-details .recipe-directions .recipe-directions-edit {
         /*is a <textarea> */
-        width: calc( 100% - 8px - 0.5em - 0.5em);
-        /* replace with variables */
         min-height: 10em;
         padding: 0.5em;
         resize: vertical; }
@@ -69,13 +81,17 @@ body {
             width: 100%; } }
 
 .recipe-name {
+  display: block;
   background-color: #DDD;
   margin-top: 0.5em;
-  margin-bottom: 0.5em; }
+  margin-bottom: 0.5em;
+  height: 2em; }
   .recipe-name h2 {
-    margin: 0; }
+    margin: 0;
+    vertical-align: middle; }
   .recipe-name:hover {
-    background-color: white; }
+    background-color: white;
+    cursor: pointer; }
 
 .edit-recipe-title {
   width: 100%;
@@ -96,10 +112,15 @@ body {
         width: 100%; } }
 
 .recipe-name-bar {
-  padding: 0; }
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  width: 100%;
+  height: 2em; }
   .recipe-name-bar .recipe-name {
     display: inline-block;
-    width: calc( 100% - 10em - 8px );
+    height: 100%;
+    width: calc( 100% - 10em );
     margin: 0;
     padding: 0; }
     @media (max-width: 25em) {
@@ -109,10 +130,12 @@ body {
       margin: 0;
       padding: 0; }
   .recipe-name-bar .recipe-buttons {
-    float: right;
+    /*float: right;*/
     display: inline-block;
-    border: 1px solid red;
+    height: 100%;
     width: 10em; }
+    .recipe-name-bar .recipe-buttons button {
+      height: 100%; }
     @media (max-width: 25em) {
       .recipe-name-bar .recipe-buttons {
         width: 100%; } }
@@ -155,5 +178,20 @@ body {
 
 .no-margin {
   margin: 0; }
+
+/* remove this */
+.not-really-textarea {
+  display: block;
+  width: 100%;
+  border: 0;
+  outline-width: 0;
+  resize: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+#edit-form {
+  border-top: 10px dotted white;
+  border-bottom: 10px dotted white; }
 
 /*# sourceMappingURL=sass.css.map */

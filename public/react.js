@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /*
 I apologize if my code gives you a headache.
@@ -23,11 +23,11 @@ function hardReset() {
 
 // is this used ?
 var IngredientListItem = React.createClass({
-	displayName: "IngredientListItem",
+	displayName: 'IngredientListItem',
 
 	render: function render() {
 		return React.createElement(
-			"div",
+			'div',
 			null,
 			this.props.name
 		);
@@ -35,55 +35,62 @@ var IngredientListItem = React.createClass({
 });
 
 var IngredientList = React.createClass({
-	displayName: "IngredientList",
+	displayName: 'IngredientList',
 
 	render: function render() {
 		return React.createElement(
-			"div",
+			'div',
 			null,
-			"ingredients"
+			'ingredients'
 		);
 	}
 });
 
 var RecipeDescription = React.createClass({
-	displayName: "RecipeDescription",
+	displayName: 'RecipeDescription',
 
 	render: function render() {
 		return React.createElement(
-			"div",
+			'div',
 			null,
 			React.createElement(IngredientList, null),
-			"This is where the directions go"
+			'This is where the directions go'
 		);
 	}
 });
 
 // shown/unshown when clicking the recipe name
 var RecipeDetails = React.createClass({
-	displayName: "RecipeDetails",
-
+	displayName: 'RecipeDetails',
 
 	render: function render() {
+
+		var test = this.props.recipe.directions;
+		console.log('boop', test);
+
+		function stringToHTML(txt) {
+			return txt.replace(/\n/g, '<br>');
+		}
+
 		var ingredientList = this.props.recipe.ingredients.map(function (entry, index) {
 			return React.createElement(
-				"li",
+				'li',
 				{ key: entry + " ingredient " + index + 1 },
 				entry
 			);
 		});
 		return React.createElement(
-			"div",
-			{ className: "recipe-details" },
+			'div',
+			{ className: 'recipe-details' },
 			React.createElement(
-				"ul",
-				{ className: "recipe-ingredients" },
+				'ul',
+				{ className: 'recipe-ingredients' },
 				ingredientList
 			),
 			React.createElement(
-				"div",
-				{ className: "recipe-directions" },
-				this.props.recipe.directions
+				'div',
+				{ className: 'recipe-directions' },
+				React.createElement('div', { rows: 'fit', type: 'text', dangerouslySetInnerHTML: { __html: stringToHTML(this.props.recipe.directions) } })
 			)
 		);
 	}
@@ -92,7 +99,7 @@ var RecipeDetails = React.createClass({
 //small version, only shows the title
 //is contained inside the RecipeBig version
 var RecipeSmall = React.createClass({
-	displayName: "RecipeSmall",
+	displayName: 'RecipeSmall',
 
 	switchDisplaySize: function switchDisplaySize() {
 		//switch between title line, and title line with details under it
@@ -105,14 +112,14 @@ var RecipeSmall = React.createClass({
 	},
 	render: function render() {
 		return React.createElement(
-			"div",
-			{ className: "recipe-name", onClick: this.switchDisplaySize },
+			'div',
+			{ className: 'recipe-name', onClick: this.switchDisplaySize },
 			React.createElement(
-				"h2",
+				'h2',
 				null,
-				" ",
+				' ',
 				this.props.recipe.name,
-				" "
+				' '
 			)
 		);
 	}
@@ -120,7 +127,7 @@ var RecipeSmall = React.createClass({
 
 //big version, shows all the info
 var RecipeBig = React.createClass({
-	displayName: "RecipeBig",
+	displayName: 'RecipeBig',
 
 	getInitialState: function getInitialState() {
 		return { clickCount: 0 };
@@ -156,24 +163,24 @@ var RecipeBig = React.createClass({
 		var thereIsAnActiveEditBox = this.props.rootElement.props.editState();
 		var subduedButton = thereIsAnActiveEditBox ? 'subdued-button' : 'button-edit';
 		return React.createElement(
-			"div",
-			{ className: "recipe" },
+			'div',
+			{ className: 'recipe' },
 			React.createElement(
-				"div",
-				{ className: "recipe-name-bar" },
+				'div',
+				{ className: 'recipe-name-bar' },
 				React.createElement(RecipeSmall, { recipe: this.props.recipe, rootElement: this.props.rootElement }),
 				React.createElement(
-					"div",
-					{ className: "recipe-buttons" },
+					'div',
+					{ className: 'recipe-buttons' },
 					React.createElement(
-						"button",
+						'button',
 						{ onClick: this.goToEditMode, className: subduedButton },
-						"edit"
+						'edit'
 					),
 					React.createElement(
-						"button",
-						{ onClick: this.confirmDelete, className: "button-delete" },
-						"delete"
+						'button',
+						{ onClick: this.confirmDelete, className: 'button-delete' },
+						'delete'
 					)
 				)
 			),
@@ -188,7 +195,7 @@ var RecipeBig = React.createClass({
 //pending changes are saved in state, once changes are saved, the updated data is sent to the parent to be used as props
 //props=saved state=notSaved
 var RecipeEdit = React.createClass({
-	displayName: "RecipeEdit",
+	displayName: 'RecipeEdit',
 
 	getInitialState: function getInitialState() {
 		// TODO: remove `defaultRecipe` and related code, as recipe is now a guaranteed prop
@@ -300,78 +307,78 @@ var RecipeEdit = React.createClass({
 		var ingredientChildren = this.state.ingredients.map(function (item, index) {
 			var keyName = recipeName + index;
 			return React.createElement(
-				"div",
+				'div',
 				{ key: keyName, index: index },
-				React.createElement("input", { className: 'edit-ingreient', placeholder: "ENTER INGREDIENT", type: "text", name: "recipe-ingredient-" + index, value: item, onChange: updateIngredientItem(index) }),
+				React.createElement('input', { className: 'edit-ingreient', placeholder: 'ENTER INGREDIENT', type: 'text', name: "recipe-ingredient-" + index, value: item, onChange: updateIngredientItem(index) }),
 				React.createElement(
-					"button",
-					{ className: 'button-ingredient-delete', type: "button", onClick: removeIngredientItem(index), ingredientIndex: index },
-					"delete"
+					'button',
+					{ className: 'button-ingredient-delete', type: 'button', onClick: removeIngredientItem(index), ingredientIndex: index },
+					'delete'
 				)
 			);
 		});
 		// the return structure shares  a lot fot he same classes that are used to format a mazimized view
 		return React.createElement(
-			"form",
-			{ className: "recipe" },
+			'form',
+			{ id: 'edit-form', className: 'recipe' },
 			React.createElement(
-				"h2",
-				{ className: "no-padding no-margin" },
-				"Edit Recipe!"
+				'h2',
+				{ className: 'no-padding no-margin' },
+				'Edit Recipe!'
 			),
 			React.createElement(
-				"div",
-				{ className: "edit-recipe-title" },
+				'div',
+				{ className: 'edit-recipe-title' },
 				React.createElement(
-					"div",
-					{ className: "edit-recipe-title-instructions" },
-					"RECIPE NAME:"
+					'div',
+					{ className: 'edit-recipe-title-instructions' },
+					'RECIPE NAME:'
 				),
-				React.createElement("input", { className: "edit-recipe-title-field", placeholder: "ENTER RECIPE NAME", type: "text", name: "recipe-name", value: this.state.name, onChange: this.updateRecipeName })
+				React.createElement('input', { className: 'edit-recipe-title-field', placeholder: 'ENTER RECIPE NAME', type: 'text', name: 'recipe-name', value: this.state.name, onChange: this.updateRecipeName })
 			),
 			React.createElement(
-				"div",
-				{ className: "recipe-details" },
+				'div',
+				{ className: 'recipe-details' },
 				React.createElement(
-					"div",
-					{ className: "recipe-ingredients" },
+					'div',
+					{ className: 'recipe-ingredients' },
 					React.createElement(
-						"div",
+						'div',
 						null,
-						"RECIPE INGREDIENTS"
+						'RECIPE INGREDIENTS'
 					),
 					React.createElement(
-						"div",
+						'div',
 						null,
 						ingredientChildren,
 						React.createElement(
-							"button",
-							{ className: 'button-ingredient-new', type: "button", onClick: this.addIngredientItem },
-							"new ingredient"
+							'button',
+							{ className: 'button-ingredient-new', type: 'button', onClick: this.addIngredientItem },
+							'new ingredient'
 						)
 					)
 				),
 				React.createElement(
-					"div",
-					{ className: "recipe-directions" },
+					'div',
+					{ className: 'recipe-directions' },
 					React.createElement(
-						"div",
+						'div',
 						null,
-						"RECIPE DIRECTIONS"
+						'RECIPE DIRECTIONS'
 					),
-					React.createElement("textarea", { className: "recipe-directions-edit", placeholder: "ENTER PREPERATION INSTRUCTIONS", type: "text", name: "recipe-directions", value: this.state.directions, onChange: this.updateRecipeDirections })
+					React.createElement('textarea', { className: "recipe-directions-edit", placeholder: 'ENTER PREPERATION INSTRUCTIONS', type: "text", name: "recipe-directions", value: this.state.directions, onChange: this.updateRecipeDirections })
 				)
 			),
-			React.createElement("br", null),
+			React.createElement('br', null),
 			React.createElement(
-				"button",
-				{ className: "chunky-button button-save", type: "button", onClick: this.saveEdit },
-				"save"
+				'button',
+				{ className: 'chunky-button button-save', type: 'button', onClick: this.saveEdit },
+				'save'
 			),
 			React.createElement(
-				"button",
-				{ className: "chunky-button button-cancel", type: "button", onClick: this.cancelEdit },
-				"cancel"
+				'button',
+				{ className: 'chunky-button button-cancel', type: 'button', onClick: this.cancelEdit },
+				'cancel'
 			)
 		);
 	}
@@ -383,7 +390,7 @@ var RecipeEdit = React.createClass({
 // 'maximized' : entre is shown completely
 // 'edit' : can edit or delete the entry
 var RecipeItem = React.createClass({
-	displayName: "RecipeItem",
+	displayName: 'RecipeItem',
 
 	getInitialState: function getInitialState() {
 		console.log('rendering container', this.props.recipe);
@@ -438,7 +445,7 @@ var RecipeItem = React.createClass({
 });
 
 var RecipeContainer = React.createClass({
-	displayName: "RecipeContainer",
+	displayName: 'RecipeContainer',
 
 	getInitialState: function getInitialState() {
 
@@ -453,9 +460,9 @@ var RecipeContainer = React.createClass({
 		} else {
 			// load the default recipes
 			console.log('welcome to the recipe app');
-			recipeData.push(new RecipeDataItem('pizza', ['first', 'second', 'third'], 'cook it until edible'));
-			recipeData.push(new RecipeDataItem('spaghetti', ['first', 'second', 'third'], 'cook it until edible'));
-			recipeData.push(new RecipeDataItem('Pizza', ['phone', 'money'], 'Call pizza shop that has delivery service.\nPay money to delivery guy.'));
+			recipeData.push(new RecipeDataItem('Creamy Tomato Spaghetti', ['Back bacon', 'Zucchini', 'Mushrooms', 'Spaghetti', 'Olives', 'Parsley'], "1. Slice the bacon into 1-2cm squares and fry them. Set aside.\n\n2. Boil the spaghetti until al dente.\n\n3. Using the remaining fat from the bacon, add some oil if necessary to fry the mushrooms and zucchini. You know it's done when the mushroom turns colour. Add olives  and 2 T of spaghetti water. \n\n4. Mix the sour cream and tomato sauce in a small bowl and pour the mixture into the pan. Mix it in.\n\n5. When the pasta is done, drain it well and add to the pan. Mix well.\n\n6. Serve and top with the bacon and some parsley."));
+			recipeData.push(new RecipeDataItem('Fried Plaintains', ['1 quart oil', '2 ripe plantiains'], 'Preheat oil in in a skillet or frying pan.\n\nPeel the plantains and cut them in half. Slice the halves lengthwise into thin pieces.\n\nFry the pieces until browned and tender. Drain excell oil.'));
+			recipeData.push(new RecipeDataItem('Pizza', ['phone', 'money'], 'Call pizza shop that has delivery service. Pay money to delivery guy.'));
 
 			localStorage.setItem('recipe data', JSON.stringify(recipeData));
 		}
@@ -517,20 +524,20 @@ var RecipeContainer = React.createClass({
 		var newRecipeButton;
 		if (this.editState() === false) {
 			newRecipeButton = React.createElement(
-				"button",
+				'button',
 				{ onClick: this.newBlankRecipe, id: "button-add-new" },
-				"ADD NEW"
+				'ADD NEW'
 			);
 		}
 		return React.createElement(
-			"div",
+			'div',
 			null,
 			recipeEntries,
 			newRecipeButton,
 			React.createElement(
-				"button",
+				'button',
 				{ onClick: hardReset, id: 'button-reset-app' },
-				"Reset App"
+				'Reset App'
 			)
 		);
 	}
@@ -538,29 +545,29 @@ var RecipeContainer = React.createClass({
 
 // DELETE ??? ? ? ? ? ? ?
 var RecipeTitle = React.createClass({
-	displayName: "RecipeTitle",
+	displayName: 'RecipeTitle',
 
 	render: function render() {
 		return React.createElement(
-			"div",
+			'div',
 			null,
-			"recepe name edit delete",
+			'recepe name edit delete',
 			React.createElement(RecipeDescription, null)
 		);
 	}
 });
 
 var RecipeApp = React.createClass({
-	displayName: "RecipeApp",
+	displayName: 'RecipeApp',
 
 	render: function render() {
 		return React.createElement(
-			"div",
+			'div',
 			null,
 			React.createElement(
-				"h1",
+				'h1',
 				null,
-				"Recipes!"
+				'Recipes!'
 			),
 			React.createElement(RecipeContainer, null)
 		);

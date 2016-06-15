@@ -55,8 +55,15 @@ var RecipeDescription = React.createClass({
 
 // shown/unshown when clicking the recipe name
 var RecipeDetails = React.createClass({
-	
 	render: function() {
+		
+		var test = this.props.recipe.directions;
+		console.log('boop', test) 
+		
+		function stringToHTML(txt) {
+			return txt.replace(/\n/g, '<br>');
+		}
+		
 		var ingredientList = this.props.recipe.ingredients.map(function(entry, index) {
 			return <li key={entry+" ingredient "+index+1}>{entry}</li>
 		});
@@ -65,9 +72,11 @@ var RecipeDetails = React.createClass({
 				<ul className="recipe-ingredients">
 					{ingredientList}
 				</ul>
-				<div className="recipe-directions">{this.props.recipe.directions}</div>
+				<div className="recipe-directions">
+					<div rows='fit' type="text" dangerouslySetInnerHTML={{__html: stringToHTML(this.props.recipe.directions)}} />
+				</div>
 			</div>
-		) 
+		)  
 	}
 });
 
@@ -280,7 +289,7 @@ var RecipeEdit = React.createClass({
 		});
 		// the return structure shares  a lot fot he same classes that are used to format a mazimized view
 		return (
-			<form className="recipe" >
+			<form id="edit-form" className="recipe" >
 				<h2 className="no-padding no-margin">Edit Recipe!</h2>
 				<div className="edit-recipe-title">
 					<div className="edit-recipe-title-instructions">RECIPE NAME:</div> 
@@ -381,9 +390,34 @@ var RecipeContainer = React.createClass({
 		} else {
 			// load the default recipes
 			console.log('welcome to the recipe app');
-			recipeData.push(new RecipeDataItem('pizza', ['first', 'second', 'third'], 'cook it until edible'));
-			recipeData.push(new RecipeDataItem('spaghetti', ['first', 'second', 'third'], 'cook it until edible'));
-			recipeData.push(new RecipeDataItem('Pizza', ['phone', 'money'], 'Call pizza shop that has delivery service.\nPay money to delivery guy.'));
+			recipeData.push(new RecipeDataItem(
+				'Creamy Tomato Spaghetti', 
+				[
+					'Back bacon' , 
+					'Zucchini', 
+					'Mushrooms',
+					'Spaghetti',
+					'Olives',
+					'Parsley'
+				], 
+				"1. Slice the bacon into 1-2cm squares and fry them. Set aside.\n\n2. Boil the spaghetti until al dente.\n\n3. Using the remaining fat from the bacon, add some oil if necessary to fry the mushrooms and zucchini. You know it's done when the mushroom turns colour. Add olives  and 2 T of spaghetti water. \n\n4. Mix the sour cream and tomato sauce in a small bowl and pour the mixture into the pan. Mix it in.\n\n5. When the pasta is done, drain it well and add to the pan. Mix well.\n\n6. Serve and top with the bacon and some parsley."
+			));
+			recipeData.push(new RecipeDataItem(
+				'Fried Plaintains', 
+				[
+					'1 quart oil', 
+					'2 ripe plantiains'
+				], 
+				'Preheat oil in in a skillet or frying pan.\n\nPeel the plantains and cut them in half. Slice the halves lengthwise into thin pieces.\n\nFry the pieces until browned and tender. Drain excell oil.'
+			));
+			recipeData.push(new RecipeDataItem(
+				'Pizza', 
+				[
+					'phone', 
+					'money'
+				], 
+				'Call pizza shop that has delivery service. Pay money to delivery guy.'
+			));
 			
 			localStorage.setItem('recipe data', JSON.stringify(recipeData));
 		}
