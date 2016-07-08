@@ -1,10 +1,7 @@
-/*
-	color scheme ideas:
-*/
-* {
-  border: 1px solid black;
-  padding: 1px; }
-
+/**
+*
+*
+**/
 body {
   text-align: center; }
 
@@ -15,23 +12,36 @@ body {
   display: inline-block;
   font-size: 100%; }
 
+h1 {
+  padding: 0;
+  margin: 0; }
+
+input {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
 .recipe {
-  border: 2px solid green;
   background-color: #AAA;
   margin-top: 1em;
   margin-bottom: 1em; }
   .recipe .recipe-details {
     display: inline-block;
     width: 100%;
-    border: 1px solid orange;
+    padding: 0;
+    vertical-align: top;
     /*used for ingredient list and directions box */
     /* ingredient list */ }
     .recipe .recipe-details ul {
       display: inline-block;
-      height: 100%;
-      list-style-position: inside; }
+      list-style-position: inside;
+      padding: 0; }
+    .recipe .recipe-details li {
+      border-bottom: 1px solid #888; }
     .recipe .recipe-details .recipe-ingredients {
-      float: left;
+      /*float: left;*/
+      /* for some reason this sticks to bottom if vert align isn't specified to top */
+      vertical-align: top;
       display: inline-block;
       background-color: #DDD;
       margin: 0.25em;
@@ -40,27 +50,35 @@ body {
         .recipe .recipe-details .recipe-ingredients {
           width: calc( 100% - ( 0.25em * 2 )); } }
       .recipe .recipe-details .recipe-ingredients .edit-ingreient {
-        width: calc( 100% - 3.5em - 4px ); }
+        width: calc( 100% - 4em - 4px ); }
       .recipe .recipe-details .recipe-ingredients .button-ingredient-delete {
-        width: 3.5em; }
+        width: 4em; }
       .recipe .recipe-details .recipe-ingredients .button-ingredient-new {
-        width: 100%; }
+        width: calc( 100% - 0.25em ); }
+    .recipe .recipe-details textarea {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      width: 100%;
+      padding-bottom: 0.5em;
+      heght: auto;
+      resize: none; }
     .recipe .recipe-details .recipe-directions {
+      text-align: left;
       background-color: #DDD;
-      float: right;
+      /*float: right;*/
       display: inline-block;
       min-height: 2em;
       margin: 0.25em;
-      width: calc( 50% - ( 0.25em * 2 ) - 8px );
-      /* FIX THIS LATER !!!! !!!! !!!! */
+      width: calc( 50% - ( 0.25em * 2 ) );
       height: 100%; }
       @media (max-width: 25em) {
         .recipe .recipe-details .recipe-directions {
           width: calc( 100% - ( 0.25em * 2 )); } }
+      .recipe .recipe-details .recipe-directions div {
+        margin: 0.5em; }
       .recipe .recipe-details .recipe-directions .recipe-directions-edit {
         /*is a <textarea> */
-        width: calc( 100% - 8px - 0.5em - 0.5em);
-        /* replace with variables */
         min-height: 10em;
         padding: 0.5em;
         resize: vertical; }
@@ -68,20 +86,57 @@ body {
           .recipe .recipe-details .recipe-directions .recipe-directions-edit {
             width: 100%; } }
 
+/* there is another `.recipe-name group further down for when inside another class */
 .recipe-name {
+  display: block;
   background-color: #DDD;
   margin-top: 0.5em;
-  margin-bottom: 0.5em; }
+  margin-bottom: 0.5em;
+  min-height: 2em; }
   .recipe-name h2 {
-    margin: 0; }
-  .recipe-name:hover {
-    background-color: white; }
+    margin: 0;
+    vertical-align: middle; }
+  @media (hover) {
+    .recipe-name:hover {
+      background-color: white;
+      cursor: pointer; } }
+
+.edit-recipe-title {
+  width: 100%;
+  margin: 0;
+  padding: 0; }
+  .edit-recipe-title .edit-recipe-title-instructions {
+    /* text that says "RECIPE NAME:" */
+    background-color: #DDD;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    width: 8em; }
+    @media (max-width: 25em) {
+      .edit-recipe-title .edit-recipe-title-instructions {
+        width: 100%; } }
+  .edit-recipe-title .edit-recipe-title-field {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    /* TODO: make it pixerl perfect */
+    /*width is NOT pixel perfect, the 2em where thrown in there as a kludge */
+    width: calc( 100% - 8em - 2em ); }
+    @media (max-width: 25em) {
+      .edit-recipe-title .edit-recipe-title-field {
+        width: 100%; } }
 
 .recipe-name-bar {
-  padding: 0; }
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  width: 100%;
+  min-height: 2em;
+  background-color: #DDD; }
   .recipe-name-bar .recipe-name {
     display: inline-block;
-    width: calc( 100% - 10em - 8px );
+    min-height: 2em;
+    min-width: calc( 100% - 10em );
     margin: 0;
     padding: 0; }
     @media (max-width: 25em) {
@@ -91,14 +146,16 @@ body {
       margin: 0;
       padding: 0; }
   .recipe-name-bar .recipe-buttons {
-    float: right;
+    /*float: right;*/
     display: inline-block;
-    border: 1px solid red;
+    height: 2em;
     width: 10em; }
     @media (max-width: 25em) {
       .recipe-name-bar .recipe-buttons {
-        width: 100%; } }
+        width: 100%;
+        height: calc( 2em / 2 ); } }
     .recipe-name-bar .recipe-buttons button {
+      height: 100%;
       width: 50%; }
       @media (max-width: 25em) {
         .recipe-name-bar .recipe-buttons button {
@@ -119,7 +176,8 @@ body {
   font-size: 125%;
   padding: 0.25em;
   margin: 0.25em;
-  border-radius: 0.50em; }
+  border-radius: 0.50em;
+  width: 5em; }
   .chunky-button.button-save {
     background-color: #79f; }
   .chunky-button.button-cancel {
@@ -130,5 +188,26 @@ body {
 
 .button-delete {
   background-color: #f97; }
+
+.no-padding {
+  padding: 0; }
+
+.no-margin {
+  margin: 0; }
+
+/* remove this */
+.not-really-textarea {
+  display: block;
+  width: 100%;
+  border: 0;
+  outline-width: 0;
+  resize: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+#edit-form {
+  border-top: 10px dotted white;
+  border-bottom: 10px dotted white; }
 
 /*# sourceMappingURL=sass.css.map */

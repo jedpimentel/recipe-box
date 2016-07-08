@@ -1,11 +1,11 @@
 "use strict";
 
-/*
-I apologize if my code gives you a headache.
-I'm still learning how to even use React at all as I write this
-some of the stuff is stuck with gum, as refactoring would be impractical
-
-
+/**
+* I apologize if my code gives you a headache.
+* I'm still learning how to even use React at all as I write this
+* some of the stuff is stuck with gum, as refactoring would be impractical
+*
+*
 */
 
 function RecipeDataItem(name, ingredients, directions) {
@@ -20,19 +20,6 @@ function hardReset() {
 		location.reload();
 	}
 }
-
-// is this used ?
-var IngredientListItem = React.createClass({
-	displayName: "IngredientListItem",
-
-	render: function render() {
-		return React.createElement(
-			"div",
-			null,
-			this.props.name
-		);
-	}
-});
 
 var IngredientList = React.createClass({
 	displayName: "IngredientList",
@@ -63,8 +50,14 @@ var RecipeDescription = React.createClass({
 var RecipeDetails = React.createClass({
 	displayName: "RecipeDetails",
 
-
 	render: function render() {
+
+		var test = this.props.recipe.directions;
+
+		function stringToHTML(txt) {
+			return txt.replace(/\n/g, '<br>');
+		}
+
 		var ingredientList = this.props.recipe.ingredients.map(function (entry, index) {
 			return React.createElement(
 				"li",
@@ -83,7 +76,7 @@ var RecipeDetails = React.createClass({
 			React.createElement(
 				"div",
 				{ className: "recipe-directions" },
-				this.props.recipe.directions
+				React.createElement("div", { rows: "fit", type: "text", dangerouslySetInnerHTML: { __html: stringToHTML(this.props.recipe.directions) } })
 			)
 		);
 	}
@@ -97,10 +90,8 @@ var RecipeSmall = React.createClass({
 	switchDisplaySize: function switchDisplaySize() {
 		//switch between title line, and title line with details under it
 
-		console.log('clicked', this);
 		var currentDisplayType = this.props.rootElement.state.displayFormat;
 		var newDisplayType = currentDisplayType == 'minimized' ? 'maximized' : 'minimized';
-		console.log('from', currentDisplayType, 'to', newDisplayType);
 		this.props.rootElement.setDisplayType(newDisplayType);
 	},
 	render: function render() {
@@ -122,29 +113,19 @@ var RecipeSmall = React.createClass({
 var RecipeBig = React.createClass({
 	displayName: "RecipeBig",
 
-	getInitialState: function getInitialState() {
-		return { clickCount: 0 };
-	},
 	goToEditMode: function goToEditMode() {
-		console.log(this.state.clickCount);
 		if (this.props.rootElement.props.editState() === false) {
 			this.props.rootElement.setDisplayType('edit');
-		} else if (this.state.clickCount >= 0) {
-			// `clickCount` was meant to be used so user would have to click the edit button a few times before the popu info appeared, felt like a cool idea at the time, but I set it to zero since it's a pretty weird feature to have.
-
-			alert('please save or cancel any pending edits before editting another recipe. (the big blue button)');
 		} else {
-			this.setState({ clickCount: this.state.clickCount + 1 });
+			alert('please save or cancel any pending edits before editting another recipe. (the big blue button)');
 		}
 	},
 	deleteRecipe: function deleteRecipe() {
-		console.log("TODO: delete this recipe");
 		this.props.rootElement.setDisplayType('delete');
 	},
 	confirmDelete: function confirmDelete() {
 		function confirmDelete() {
 			if (window.confirm("Are you sure you want to delete " + this.props.recipe.name + "?")) {
-				console.log('deleting...', this);
 				this.deleteRecipe();
 			} else {
 				;
@@ -191,14 +172,9 @@ var RecipeEdit = React.createClass({
 	displayName: "RecipeEdit",
 
 	getInitialState: function getInitialState() {
-		// TODO: remove `defaultRecipe` and related code, as recipe is now a guaranteed prop
-
-		var defaultRecipe = new RecipeDataItem('name', ['ingredient1', 'ingredient2', 'ingredient3'], 'description');
-
-		var initialStateRecipe = this.props.hasOwnProperty('recipe') ? this.props.recipe : defaultRecipe;
+		var initialStateRecipe = this.props.recipe;
 		var initialIngredients = initialStateRecipe.ingredients.slice();
 
-		console.log(initialIngredients);
 		return {
 			'recipe': initialStateRecipe,
 			'name': initialStateRecipe.name,
@@ -206,16 +182,10 @@ var RecipeEdit = React.createClass({
 			'ingredients': initialIngredients
 		};
 	},
-	handleChange: function handleChange(event) {
-		goBoopBeep();
-		this.setState({});
-	},
 	updateRecipeName: function updateRecipeName(event) {
-		goBoopBeep();
 		this.setState({ name: event.target.value });
 	},
 	updateRecipeDirections: function updateRecipeDirections(event) {
-		goBoopBeep();
 		this.setState({ directions: event.target.value });
 	},
 	updateIngredientItem: function updateIngredientItem(index) {
@@ -234,14 +204,11 @@ var RecipeEdit = React.createClass({
 				// all recipes need at least one ingredient
 				newIngredients.push('');
 			}
-			console.log(newIngredients);
 			this.setState({ ingredients: newIngredients });
-			console.log(this.state);
 		}.bind(this);
 	},
 	addIngredientItem: function addIngredientItem() {
-
-		var emptyIngredient = ['boop'];
+		var emptyIngredient = [''];
 		this.setState({ ingredients: this.state.ingredients.concat(emptyIngredient) });
 	},
 	transformToMaximized: function transformToMaximized() {
@@ -250,23 +217,18 @@ var RecipeEdit = React.createClass({
 		this.props.rootElement.setDisplayType('maximized');
 	},
 	cancelEdit: function cancelEdit() {
-		// disregard current state of this element and switch to a non-edit view
-		// TODO: if it was meant as a "new" recipe, this option should delete the recipe.
-		//this.props.rootElement.setState({displayFormat: 'maximized'})
-
-		// if this was an existing recipe (else assume it was a new/tentative recipe)
-		console.log(this.props);
-		if (this.props.hasOwnProperty('recipe')) {
-			// revert to orinal state
+		if (this.props.recipe.name !== '') {
+			// recipe existed, revert to orinal values
 			this.setState({
+				// TODO: check these for unnecessary redundancy
 				'recipe': this.props.recipe,
 				'name': this.props.recipe.name,
 				'directions': this.props.recipe.directions,
 				'ingredients': this.state.recipe.ingredients
 			});
 		} else {
-			// delete the recipe
-			// the following setDisplayType might need be moved to the previous if
+			// recipe was a new "blank" recipe, identified by not having a name
+			this.props.rootElement.setDisplayType('delete');
 		}
 		this.transformToMaximized();
 	},
@@ -275,10 +237,18 @@ var RecipeEdit = React.createClass({
 		// remove blank ingredient entries
 
 		// update root's data
-		console.log('saving...');
-		var newRecipe = new RecipeDataItem(this.state.name, this.state.ingredients.slice(0), this.state.directions);
+		var newRecipe = new RecipeDataItem(this.state.name.trim(), this.state.ingredients.slice(0).map(function (el, indx) {
+			return el.trim();
+		}).filter(function (el) {
+			return el !== '';
+		}), this.state.directions.trim());
 
-		console.log('saving...');
+		if (newRecipe.name.length === 0 || newRecipe.ingredients.length === 0 || newRecipe.directions.length === 0) {
+			// there is blank data, recipe is invalid
+			var alertText = "Please be check if you have the whole written down." + (newRecipe.name.length === 0 ? "\nThe Recipe has no name." : "") + (newRecipe.ingredients.length === 0 ? "\nThe recipe needs at least one ingredient." : "") + (newRecipe.directions.length === 0 ? "\nThe recipe needs instructions" : "");
+			alert(alertText);
+			return;
+		}
 		this.props.rootElement.props.updateRecipeData(newRecipe);
 		this.transformToMaximized();
 	},
@@ -292,7 +262,7 @@ var RecipeEdit = React.createClass({
 			return React.createElement(
 				"div",
 				{ key: keyName, index: index },
-				React.createElement("input", { className: 'edit-ingreient', type: "text", name: "recipe-ingredient-" + index, value: item, onChange: updateIngredientItem(index) }),
+				React.createElement("input", { className: 'edit-ingreient', placeholder: "ENTER INGREDIENT", type: "text", name: "recipe-ingredient-" + index, value: item, onChange: updateIngredientItem(index) }),
 				React.createElement(
 					"button",
 					{ className: 'button-ingredient-delete', type: "button", onClick: removeIngredientItem(index), ingredientIndex: index },
@@ -303,16 +273,21 @@ var RecipeEdit = React.createClass({
 		// the return structure shares  a lot fot he same classes that are used to format a mazimized view
 		return React.createElement(
 			"form",
-			{ className: "recipe" },
+			{ id: "edit-form", className: "recipe" },
+			React.createElement(
+				"h2",
+				{ className: "no-padding no-margin" },
+				"Edit Recipe!"
+			),
 			React.createElement(
 				"div",
-				null,
+				{ className: "edit-recipe-title" },
 				React.createElement(
-					"span",
-					null,
-					"RECIPE NAME  :  "
+					"div",
+					{ className: "edit-recipe-title-instructions" },
+					"RECIPE NAME:"
 				),
-				React.createElement("input", { type: "text", name: "recipe-name", value: this.state.name, onChange: this.updateRecipeName })
+				React.createElement("input", { className: "edit-recipe-title-field", placeholder: "ENTER RECIPE NAME", type: "text", name: "recipe-name", value: this.state.name, onChange: this.updateRecipeName })
 			),
 			React.createElement(
 				"div",
@@ -344,7 +319,7 @@ var RecipeEdit = React.createClass({
 						null,
 						"RECIPE DIRECTIONS"
 					),
-					React.createElement("textarea", { className: "recipe-directions-edit", type: "text", name: "recipe-directions", value: this.state.directions, onChange: this.updateRecipeDirections })
+					React.createElement("textarea", { className: "recipe-directions-edit", placeholder: "ENTER PREPERATION INSTRUCTIONS", type: "text", name: "recipe-directions", value: this.state.directions, onChange: this.updateRecipeDirections })
 				)
 			),
 			React.createElement("br", null),
@@ -371,27 +346,22 @@ var RecipeItem = React.createClass({
 	displayName: "RecipeItem",
 
 	getInitialState: function getInitialState() {
-		console.log('rendering container', this.props.recipe);
-		var recipeData;
+		//console.log('rendering container', this.props.recipe);
 		var displayFormat;
 		if (this.props.recipe === undefined) {
-			var blankRecipe = new RecipeDataItem('burger', ['first', 'second', 'third'], 'cook it until edible');
-			recipeData = blankRecipe;
 			displayFormat = 'edit';
 		} else {
-			recipeData = this.props.recipe;
 			displayFormat = 'minimized';
 		}
 
 		return {
 			// the `delete` display format isn't a real view, instead it's used as part of the rube goldberg machine that deletes recipes
 			validDisplayFormats: ['minimized', 'maximized', 'edit', 'delete'],
-			displayFormat: displayFormat,
-			recipe: recipeData
+			displayFormat: displayFormat
 		};
 	},
+	// recipe: recipeData,
 	setDisplayType: function setDisplayType(type) {
-		console.log('setting diplay type');
 		if (this.state.validDisplayFormats.indexOf(type) === -1) {
 			console.log(type, 'is not a valid display format, must be one of', this.sate.validdisplayFormats);
 			return;
@@ -407,7 +377,7 @@ var RecipeItem = React.createClass({
 	},
 	render: function render() {
 		// I has used 'state' instead of 'prop' when sending values to the recepies, this caused a huge bug where the ingredient list sizes wheren't updated when a list item was added or removed, even though text changes had no issue. Then I couldn't add new recipies until I reverted <RecipeEdit> to use state. But then starting a second edit in a same version reverted the first edit's changes, apparently since it was keeping the previous state. ended up moving them all to use props, moving the blank recipe here instead of inside the RecipeEdit
-		var blankRecipe = new RecipeDataItem('burger', ['first', 'second', 'third'], 'cook it until edible');
+		var blankRecipe = new RecipeDataItem('', ['', '', ''], '');
 		var recipe = this.props.recipe !== undefined ? this.props.recipe : blankRecipe;
 		var formatType = this.state.displayFormat;
 		if (formatType === 'minimized') {
@@ -431,24 +401,18 @@ var RecipeContainer = React.createClass({
 	getInitialState: function getInitialState() {
 
 		var recipeData = [];
-		//console.log(localStorage.getItem('recipe data'))
-		//localStorage.clear();
-
 		if (localStorage.getItem('recipe data') !== null) {
 			// local storage exists
-			console.log('thanks for coming back :D');
 			recipeData = JSON.parse(localStorage.getItem('recipe data'));
 		} else {
 			// load the default recipes
-			console.log('welcome to the recipe app');
-			recipeData.push(new RecipeDataItem('pizza', ['first', 'second', 'third'], 'cook it until edible'));
-			recipeData.push(new RecipeDataItem('spaghetti', ['first', 'second', 'third'], 'cook it until edible'));
-			recipeData.push(new RecipeDataItem('pancakes', ['first', 'second', 'third'], 'cook it until edible'));
+			recipeData.push(new RecipeDataItem('Creamy Tomato Spaghetti', ['Back bacon', 'Zucchini', 'Mushrooms', 'Spaghetti', 'Olives', 'Parsley'], "1. Slice the bacon into 1-2cm squares and fry them. Set aside.\n\n2. Boil the spaghetti until al dente.\n\n3. Using the remaining fat from the bacon, add some oil if necessary to fry the mushrooms and zucchini. You know it's done when the mushroom turns colour. Add olives  and 2 T of spaghetti water. \n\n4. Mix the sour cream and tomato sauce in a small bowl and pour the mixture into the pan. Mix it in.\n\n5. When the pasta is done, drain it well and add to the pan. Mix well.\n\n6. Serve and top with the bacon and some parsley."));
+			recipeData.push(new RecipeDataItem('Fried Plaintains', ['1 quart oil', '2 ripe plantiains'], 'Preheat oil in in a skillet or frying pan.\n\nPeel the plantains and cut them in half. Slice the halves lengthwise into thin pieces.\n\nFry the pieces until browned and tender. Drain excell oil.'));
+			recipeData.push(new RecipeDataItem('White Rice', ['1 cup long-grain white rice', '1/2 teaspoon salt'], '1.Bring 1 1/2 cups water to a boil in a medium saucepan. Stir in rice and salt and return to a boil over medium-high heat.\n\n2.Reduce heat to a simmer, cover, and cook until rice is tender and has absorbed all the liquid, 16 to 18 minutes (check only toward the end of cooking time). The rice should be studded with craters, or steam holes, when it is ready.\n\n3.Remove from heat and let steam, covered, for 10 minutes. Then fluff with a fork and serve.'));
 
 			localStorage.setItem('recipe data', JSON.stringify(recipeData));
 		}
 
-		console.log(JSON.parse(localStorage.getItem('recipe data')));
 		return {
 			recipeData: recipeData,
 			editState: false
@@ -465,14 +429,9 @@ var RecipeContainer = React.createClass({
 	},
 	updateRecipeData: function updateRecipeData(index) {
 		return function (recipe) {
-
-			console.log('attempting to save ' + recipe + ' in index ' + index);
-
 			var newData = this.state.recipeData.slice(0);
-
 			if (recipe === 'delete') {
 				// replacing the recipe data with a 'delete' string means use clicked the 'delete' button
-				console.log('deleting...');
 				newData = newData.filter(function (el, indx, arr) {
 					return indx !== index;
 				});
@@ -484,13 +443,9 @@ var RecipeContainer = React.createClass({
 		}.bind(this);
 	},
 	newBlankRecipe: function newBlankRecipe() {
-
-		console.log("creating a new blank recipe...");
 		var newRecipeState = this.state.recipeData.slice(0);
-
 		var blankRecipe = undefined;
 		newRecipeState.push(blankRecipe);
-
 		this.editState(true);
 		this.setState({ recipeData: newRecipeState });
 	},
@@ -499,7 +454,7 @@ var RecipeContainer = React.createClass({
 		var updateFunction = this.updateRecipeData;
 		var recipeEntries = this.state.recipeData.map(function (entry, index) {
 			var keyValue = entry === undefined ? "newRecipe" : entry.name;
-			console.log('rendering', entry);
+			//console.log('rendering', entry);
 			return React.createElement(RecipeItem, { recipe: entry, key: keyValue, updateRecipeData: updateFunction(index), editState: editState });
 		});
 		var newRecipeButton;
@@ -520,20 +475,6 @@ var RecipeContainer = React.createClass({
 				{ onClick: hardReset, id: 'button-reset-app' },
 				"Reset App"
 			)
-		);
-	}
-});
-
-// DELETE ??? ? ? ? ? ? ?
-var RecipeTitle = React.createClass({
-	displayName: "RecipeTitle",
-
-	render: function render() {
-		return React.createElement(
-			"div",
-			null,
-			"recepe name edit delete",
-			React.createElement(RecipeDescription, null)
 		);
 	}
 });

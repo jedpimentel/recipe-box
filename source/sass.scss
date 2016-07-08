@@ -1,6 +1,7 @@
-/*
-	color scheme ideas:
-*/
+/**
+*
+*
+**/
 
 $mobile-width: 25em;
 $color-main-white: white;
@@ -9,14 +10,13 @@ $color-main-mid: #AAA;
 $color-main-dark: #888;
 $color-main-black: #222;
 
+$margin-thin: 0.25em;
 
 $color-main-edit: #79f;
 $color-main-delete: #f97;
 
-* {
-	border: 1px solid black;
-	padding: 1px;
-}
+$recipe-name-bar-height: 2em;
+
 
 body {
 	text-align: center;
@@ -30,11 +30,20 @@ body {
 	font-size: 100%;
 }
 
+h1 {
+	padding: 0;
+	margin: 0;
+}
 
+
+input {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
 
 .recipe {
 	
-	border: 2px solid green; 
 	background-color: $color-main-mid;
 	margin-top: 1em;
 	margin-bottom: 1em;
@@ -42,22 +51,27 @@ body {
 	.recipe-details { 
 		display: inline-block;
 		width: 100%;
-		border: 1px solid orange;
-		
+		padding: 0;
+		vertical-align: top;
 		ul {
 			display: inline-block;
 			
-			height: 100%;
 			list-style-position: inside;
-			
+			padding: 0;
+		}
+		
+		li {
+			border-bottom: 1px solid $color-main-dark;
 		}
 		
 		/*used for ingredient list and directions box */
-		$detail-group-margin: 0.25em;
+		$detail-group-margin: $margin-thin;
 		
 		/* ingredient list */
 		.recipe-ingredients {
-			float: left;
+			/*float: left;*/
+			/* for some reason this sticks to bottom if vert align isn't specified to top */
+			vertical-align: top;
 			display: inline-block;
 			background-color: $color-main-light;
 			margin: $detail-group-margin;
@@ -67,43 +81,52 @@ body {
 			}
 			
 			
-			$button-ingredient-delete-width: 3.5em;
+			$button-ingredient-delete-width: 4em;
 			.edit-ingreient {
 				width: calc( 100% - #{$button-ingredient-delete-width} - 4px );
 			}
 			.button-ingredient-delete {
 				width: $button-ingredient-delete-width;
 				
-				
-				
-				
 			}
-			
-			
-			
-			
 			.button-ingredient-new {
-				width: 100%;
+				width: calc( 100% - #{$margin-thin} );
 			}
 			
 		} 
 		
+		textarea {
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+			width: 100%;
+			
+			padding-bottom: 0.5em;
+			
+			heght: auto;
+			resize: none;
+		}
+		
 		.recipe-directions {
+			text-align: left;
 			background-color: $color-main-light;
-			float: right;
+			/*float: right;*/
 			display: inline-block;
-			min-height: 2em;
+			min-height: 2em; 
 			margin: $detail-group-margin;
-			width: calc( 50% - ( #{$detail-group-margin} * 2 ) - 8px ); /* FIX THIS LATER !!!! !!!! !!!! */
+			width: calc( 50% - ( #{$detail-group-margin} * 2 ) ); 
 			@media (max-width: $mobile-width) {
 				width: calc( 100% - ( #{$detail-group-margin} * 2 ));
+			}
+			
+			div {
+				margin: 0.5em;
 			}
 			
 			height: 100%;
 			
 			.recipe-directions-edit {
 				/*is a <textarea> */
-				width: calc( 100% - 8px - 0.5em - 0.5em); /* replace with variables */
 				min-height: 10em;
 				@media (max-width: $mobile-width) {
 					width: 100%;
@@ -119,29 +142,74 @@ body {
 
 
 
-
+/* there is another `.recipe-name group further down for when inside another class */
 .recipe-name {
+	display: block;
 	background-color: $color-main-light;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
+	min-height: $recipe-name-bar-height;
 	h2 {
 	margin: 0;
+	
+	vertical-align: middle;
 	}
-	&:hover{
-		background-color: $color-main-white;
+	
+	@media (hover) {
+		&:hover{
+			background-color: $color-main-white;
+			cursor: pointer;
+		}
 	}
 }
 
+
+.edit-recipe-title {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	$recipe-title-instructions-width: 8em;
+	
+	.edit-recipe-title-instructions {
+		/* text that says "RECIPE NAME:" */
+		background-color: $color-main-light;
+		display: inline-block;
+		padding: 0;
+		margin: 0;
+		width: $recipe-title-instructions-width;
+		@media (max-width: $mobile-width) {
+			width: 100%;
+		}
+	}
+	.edit-recipe-title-field {
+		display: inline-block;
+		padding: 0;
+		margin: 0;
+		/* TODO: make it pixerl perfect */
+		
+		/*width is NOT pixel perfect, the 2em where thrown in there as a kludge */ 
+		width: calc( 100% - #{$recipe-title-instructions-width} - 2em ); 
+		@media (max-width: $mobile-width) {
+			width: 100%;
+		}
+	}
+}
 
 
 .recipe-name-bar {
 	$buttons-group-width: 10em;
 	padding: 0;
+	margin: 0;
+	display: inline-block;
+	width: 100%;
+	min-height: $recipe-name-bar-height;
+	background-color: $color-main-light;
 
 	.recipe-name { 
 		 
 		display: inline-block;
-		width: calc( 100% - #{$buttons-group-width} - 8px );  
+		min-height: $recipe-name-bar-height;
+		min-width: calc( 100% - #{$buttons-group-width} );  
 		@media (max-width: $mobile-width) {
 			width: 100%;
 		}
@@ -153,15 +221,19 @@ body {
 		}
 	}	
 	.recipe-buttons {
-		float: right;
+		/*float: right;*/
 		display: inline-block;
+		height: $recipe-name-bar-height;
 		
-		border: 1px solid red;
+		
+		
 		width: $buttons-group-width;
 		@media (max-width: $mobile-width) {
 			width: 100%;
+			height: calc( #{$recipe-name-bar-height} / 2 );
 		}
 		button {
+			height: 100%;
 			width: 50%;
 			@media (max-width: $mobile-width) {
 				font-size: 60%;
@@ -190,6 +262,7 @@ body {
 	padding: 0.25em;
 	margin: 0.25em;
 	border-radius: 0.50em;
+	width: 5em;
 	
 	&.button-save {
 		background-color: $color-main-edit;
@@ -209,11 +282,33 @@ body {
 	background-color: $color-main-delete;
 }
 
+.no-padding {
+	padding: 0;
+}
+.no-margin {
+	margin: 0;
+}
 
 
+/* remove this */
+.not-really-textarea {
+	display: block;
+	width: 100%;
+	border: 0;
+	outline-width: 0;
+	
+	resize: none;
+	
+	-webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
 
-
-
+#edit-form {
+	$border-style: 10px dotted $color-main-white; 
+	border-top: $border-style;
+	border-bottom: $border-style; 
+}
 
 
 
